@@ -25,22 +25,22 @@ import datetime as dtm
 import random
 
 # Device settings
-tty = '/dev/tty.usbserial-PXWV0AMC'
+#tty = '/dev/tty.usbserial-PXWV0AMC'
 VeAddr = 5
 IcAddr = 1
 IgAddr = 2
 
-# from sys import platform as _platform
-# if _platform == "linux" or _platform == "linux2":
-#     # linux
-#     tty = '/dev/ttyUSB0'
-# elif _platform == "darwin":
-#     # OS X
-#     tty = '/dev/tty.usbserial-PXWV0AMC'
-# elif _platform == "win32":
-#     # Windows...
-#     # tty =
-#     pass
+from sys import platform as _platform
+if _platform == "linux" or _platform == "linux2":
+    # linux
+    tty = '/dev/ttyUSB0'
+elif _platform == "darwin":
+    # OS X
+    tty = '/dev/tty.usbserial-PXWV0AMC'
+elif _platform == "win32":
+    # Windows...
+    # tty =
+    pass
 
 # Rc = 100e+3 # (ohm), Resistor for Faraday cup current
 # Rg = 100e+3 # (ohm), Resistor for Extractor current
@@ -232,7 +232,8 @@ class MyRoot(BoxLayout):
         # Ve_obj.OutOn()
         self.Ve_status = str(self.volt_now)
         if self.left_time <= 0:
-            self.seq_now += 1 #シーケンスを1進める
+            if self.seq_now < len[self.seq] -1
+                self.seq_now += 1 #シーケンスを1進める
             self.is_holdvolt = False
             return False
         self.left_time -= 1
