@@ -25,21 +25,23 @@ import datetime as dtm
 import random
 
 # Device settings
+tty = '/dev/tty.usbserial-PXWV0AMC'
 VeAddr = 5
 IcAddr = 1
 IgAddr = 2
 
-from sys import platform as _platform
-if _platform == "linux" or _platform == "linux2":
-    # linux
-    # tty =
-elif _platform == "darwin":
-    # OS X
-    tty = '/dev/tty.usbserial-PXWV0AMC'
-elif _platform == "win32":
-    # Windows...
-    # tty =
-    
+# from sys import platform as _platform
+# if _platform == "linux" or _platform == "linux2":
+#     # linux
+#     tty = '/dev/ttyUSB0'
+# elif _platform == "darwin":
+#     # OS X
+#     tty = '/dev/tty.usbserial-PXWV0AMC'
+# elif _platform == "win32":
+#     # Windows...
+#     # tty =
+#     pass
+
 # Rc = 100e+3 # (ohm), Resistor for Faraday cup current
 # Rg = 100e+3 # (ohm), Resistor for Extractor current
 dV = 50 # (V)
@@ -93,20 +95,23 @@ class MyRoot(BoxLayout):
                 self.time_now = 0
                 Ve_obj, Ic_obj, Ig_obj = self.connect_device()
 
-
         elif command == 'start/stop':
             if self.is_countup:
                 self.stop_timer()
                 # self.Stop_IncVolt()
                 self.abort_sequence()
             else:
-                if self.is_connected:
+                # if self.is_connected:
+                if Ve_obj:
                     msg = Ve_obj.Clear()
                 ### for simple test ###
                 # self.Start_IncVolt(1000, dt)
+                self.start_timer()
                 self.start_sequence(self.seq)
                 #######################
-                self.start_timer()
+                # else:
+                    # print('Connect first')
+
 
         elif command == 'reset':
             self.stop_timer()
@@ -124,13 +129,16 @@ class MyRoot(BoxLayout):
         """Callback function for fetching measured values
         """
         try:
-            Ve_value, Ig_value, Ic_value = self.volt_now, Ig_obj.Measure(), Ic_obj.Measure()
+            Ig_value = Ig_obj.Measure()
+            Ic_value = Ic_obj.Measure()
+            self.Ic_status = str(Ic_value)
+            self.Ig_status = str(Ig_value)
         except ValueError:
-            Ic_obj.Rst()
-            Ig_obj.Rst()
-            Ve_value, Ig_value, Ic_value = self.volt_now, Ig_obj.Measure(), Ic_obj.Measure()
-        self.Ic_status = str(Ic_value)
-        self.Ig_status = str(Ig_value)
+            Ig_value = '='
+            Ic_value = '='
+            self.Ic_status = Ic_obj.ClearBuffer()
+            self.Ig_status = Ig_obj.ClearBuffer()
+        Ve_value = self.volt_now
         ### データをファイルに追記
         StoreValue.append_to_file(filename, [self.time_now, Ve_value, Ig_value, Ic_value])
         self.time_now += 1
@@ -157,9 +165,9 @@ class MyRoot(BoxLayout):
         self.Ig_status = Ig_obj.Query('*IDN?')
         msg = Ve_obj.Clear()
         Ic_obj.Mode()
-        Ic_obj.SampleRate(rate='fast')
+        Ic_obj.SampleRate(rate='medium')
         Ig_obj.Mode()
-        Ig_obj.SampleRate(rate='fast')
+        Ig_obj.SampleRate(rate='medium')
         self.is_connected = True
         return Ve_obj, Ic_obj, Ig_obj
 
@@ -181,7 +189,7 @@ class MyRoot(BoxLayout):
     def increment_Volt(self, volt_target, *largs):
         """Callback for increasing voltage
         """
-        print('I am in increment_Volt')
+        # print('I am in increment_Volt')
         self.volt_now = Ve_obj.AskVolt()*1000
         volt_raw_now = self.volt_now/1000
         deltaV_raw = dV/1000
@@ -237,7 +245,7 @@ class MyRoot(BoxLayout):
             # trigger = Clock.create_trigger(self.on_countdown, dt_meas)
             # trigger()
             Clock.schedule_interval(self.on_countdown, dt_meas/5)
-            print('created on_countdown tregger')
+            print('created on_countdown trigger')
 
     def on_countdown(self, dt):
         """Callback for voltage sequence
@@ -296,33 +304,28 @@ class MyRoot(BoxLayout):
             total += self.seq[i][1]
         return total
 
-    def remaining_time(self):
+    def remaining_time(self,t):
         total = self.total_time()
-        rt = total - self.time_now
+        rt = total - t
         return self.lapse_time(rt)
 
     def abort_sequence(self):
         """Force to abort measurement immediately
         """
-        Clock.unschedule(self.increment_Volt)
-        Clock.unschedule(self.hold_Volt)
-        try:
-            Clock.unschedule(self.on_cowntdown)
-        except AttributeError:
-            pass
-        try:
-            Clock.unschedule(self.on_cowntup)
-        except AttributeError:
-            pass
+        events = Clock.get_events()
+        for ev in events:
+            Clock.unschedule(ev)
 
+        self.is_countdown = False
         self.is_countup = False
         self.is_changevolt = False
-        self.is_countdown = False
         if self.is_connected:
             msg = Ve_obj.Clear()
+            Ve_obj.VoltZero()
+            self.volt_now = Ve_obj.AskVolt()*1000
             Ve_obj.ShutDown()
-            Ig_obj.Cls()
-            Ic_obj.Cls()
+            # Ig_obj.Cls()
+            # Ic_obj.Cls()
         pass
 
     def Start_IncVolt(self, volt_target, dt):
@@ -352,7 +355,8 @@ class StoreValue(BoxLayout):
     @classmethod
     def get_ctime(self):
         t = dtm.datetime.now()
-        app_time = "{0:%y%m%d-%H:%M:%S}.{1}".format(t, t.microsecond)
+        point = (t.microsecond - t.microsecond%10000)/10000
+        app_time = "{0:%y%m%d-%H:%M:%S}.{1:.0f}".format(t, point)
         return app_time
 
 
@@ -520,10 +524,10 @@ class StoreValue(BoxLayout):
 #         return self.val
 
 
-class ilislifeApp(App):
-    # def build(self):
-        # return MyRoot()
+class IlislifeApp(App):
+    def build(self):
+        return MyRoot()
     pass
 
 if __name__ == '__main__':
-    ilislifeApp().run()
+    IlislifeApp().run()

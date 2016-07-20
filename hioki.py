@@ -29,6 +29,11 @@ class dmm3239gpib(GPIBUSB):
         """
         self.Instruct('*CLS')
 
+    def ClearBuffer(self):
+        """Force to clear buffer
+        """
+        return self.Query(':read?')
+
     def DataHeader(self, onoff='off'):
         if onoff == 'on':
             bit = '1'
@@ -46,12 +51,7 @@ class dmm3239gpib(GPIBUSB):
 
     def Measure(self):
         d = self.Query(':read?')
-        try:
-            return float(d)
-        except ValueError:
-            self.Cls()
-            d = self.Query(':READ?')
-            return float(d)
+        return float(d)
         # print(self.Query(':MEAS:VOLT?'))
         # return float(self.Query(':MEAS:VOLT?'))
         # data_str = self.Query(':read?')
