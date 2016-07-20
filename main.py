@@ -25,17 +25,27 @@ import datetime as dtm
 import random
 
 # Device settings
-tty = '/dev/tty.usbserial-PXWV0AMC'
 VeAddr = 5
 IcAddr = 1
 IgAddr = 2
+
+from sys import platform as _platform
+if _platform == "linux" or _platform == "linux2":
+    # linux
+    # tty =
+elif _platform == "darwin":
+    # OS X
+    tty = '/dev/tty.usbserial-PXWV0AMC'
+elif _platform == "win32":
+    # Windows...
+    # tty =
+    
 # Rc = 100e+3 # (ohm), Resistor for Faraday cup current
 # Rg = 100e+3 # (ohm), Resistor for Extractor current
 dV = 50 # (V)
 dt_meas = 1 #(s) measurement interval
 dt_op = 1 # (s) time per step for Ve change
-# DV = 200 # (V) voltage per step for time-dependence measurement
-# DUR = 100*3600 # (s) measurement time at target voltage
+
 
 # list of [Voltage (V), holding time(s)]
 DT = 60 # (s) time per step for time-dependence measurement
@@ -510,10 +520,10 @@ class StoreValue(BoxLayout):
 #         return self.val
 
 
-class ImeasureApp(App):
+class ilislifeApp(App):
     # def build(self):
         # return MyRoot()
     pass
 
 if __name__ == '__main__':
-    ImeasureApp().run()
+    ilislifeApp().run()
