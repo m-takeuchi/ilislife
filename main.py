@@ -222,6 +222,20 @@ class MyRoot(BoxLayout):
             self.is_changevolt = False
             return False
 
+    def change_Volt(self, volt_target, *largs):
+        """Callback for change voltage
+        """
+        self.volt_now = Ve_obj.AskVolt()*1000
+        if self.volt_now == volt_target:
+            return False
+        if self.volt_now < volt_target:
+            self.increment_Volt(volt_target, *largs)
+        if self.volt_now > volt_target:
+            self.decrement_Volt(volt_target, *largs)
+        else:
+            return False
+
+
     def hold_Volt(self, left_time, *largs):
         """Hold voltage output by left_time == 0
         """
@@ -232,8 +246,7 @@ class MyRoot(BoxLayout):
         # Ve_obj.OutOn()
         self.Ve_status = str(self.volt_now)
         if self.left_time <= 0:
-            if self.seq_now < len[self.seq] -1
-                self.seq_now += 1 #シーケンスを1進める
+            self.seq_now += 1 #シーケンスを1進める
             self.is_holdvolt = False
             return False
         self.left_time -= 1
@@ -251,7 +264,7 @@ class MyRoot(BoxLayout):
     def on_countdown(self, dt):
         """Callback for voltage sequence
         """
-        try:
+        if self.seq_now < len[self.seq] -1:
             # print('I am in on_countdonw'+str(self.seq_now))
             # print(Clock.get_events())
             ### 現在電圧が現在シーケンス設定電圧より低い場合に電圧増加を実行
@@ -259,10 +272,9 @@ class MyRoot(BoxLayout):
             if self.volt_now < self.volt_target:
                 ### 電圧変更中でない場合
                 if not self.is_changevolt:
-                    # eventinc = Clock.create_trigger(partial(self.increment_Volt, self.volt_target), dt_op)
-                    # eventinc() #イベントループに投入
+                    # イベントループに投入
                     self.is_changevolt = True
-                    Clock.schedule_interval(partial(self.increment_Volt, self.volt_target), dt_op)
+                    Clock.schedule_interval(partial(self.change_Volt, self.volt_target), dt_op)
 
 
             ### 現在電圧が現在シーケンス設定電圧と等しく, 電圧変更中でなく, hold_Volt中でない場合
@@ -270,10 +282,10 @@ class MyRoot(BoxLayout):
                 if not self.is_changevolt and not self.is_holdvolt:
                     self.is_holdvolt = True
                     self.left_time = self.seq[self.seq_now][1] #left_timeにシーケンスリスト
-                    # eventhold = Clock.create_trigger(partial(self.hold_Volt, self.left_time), dt_op)
-                    # eventhold() #イベントループに投入
+                    # イベントループに投入
                     Clock.schedule_interval(partial(self.hold_Volt, self.left_time), dt_op)
-        except IndexError:
+        # except IndexError:
+        elif self.seq_now == len[self.seq] -1:
             print('All sequences are finished. Measurement is now stopped.')
             self.abort_sequence()
 
