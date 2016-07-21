@@ -48,10 +48,8 @@ elif _platform == "win32":
     # tty =
     pass
 
-from config import *
 
 # Prepare file
-# filename = 'tmp.dat'
 directory = 'data/'
 filename = directory+"{0:%y%m%d-%H%M%S}.dat".format(dtm.datetime.now())
 with open(filename, mode = 'w', encoding = 'utf-8') as fh:
@@ -257,7 +255,7 @@ class MyRoot(BoxLayout):
     def on_countdown(self, dt):
         """Callback for voltage sequence
         """
-        if self.seq_now < len(self.seq) -1:
+        if self.seq_now <= len(self.seq) -1:
             # print('I am in on_countdonw'+str(self.seq_now))
             # print(Clock.get_events())
             ### 現在電圧が現在シーケンス設定電圧より低い場合に電圧増加を実行
@@ -280,7 +278,7 @@ class MyRoot(BoxLayout):
                     Clock.schedule_interval(partial(self.hold_Volt, self.left_time), dt_op)
                     print('Now on hold voltage')
         # except IndexError:
-        elif self.seq_now == len(self.seq) -1:
+        elif self.seq_now > len(self.seq) -1:
             print('All sequences are finished. Measurement is now stopped.')
             self.abort_sequence()
 
