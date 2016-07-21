@@ -293,6 +293,13 @@ class MyRoot(BoxLayout):
             out = 'Sequence is over!'
         return out
 
+    def format_seq(self, cur_seq):
+        if cur_seq <= len(self.seq) -1:
+            output = str(cur_seq)+' [sub]th[/sub]   '+str(self.seq[cur_seq][0])+' [sub]V[/sub]  '+str(self.seq[cur_seq][1])+' [sub]s[/sub]'
+        else:
+            output = str(cur_seq-1)+' [sub]th[/sub]   '+str(self.seq[cur_seq-1][0])+' [sub]V[/sub]  '+str(self.seq[cur_seq-1][1])+' [sub]s[/sub]'
+        return output
+
     def lapse_time(self, t):
         """Retrun lapse time (hh:mm:ss format)
         """
