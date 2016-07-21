@@ -2,10 +2,11 @@ from __future__ import division  # 少数点以下表示のためのモジュー
 
 ### For logging to current dir/log_dir
 import os
+from sys import platform as _platform
 from kivy.config import Config
+Config.set('kivy', 'log_name', _platform+'_kivy_%y-%m-%d_%_.txt')
 Config.set('kivy', 'log_level', 'debug')
 Config.set('kivy', 'log_dir', os.path.dirname(os.path.abspath(__file__))+'/logs/')
-print(Config.get('kivy', 'log_dir'))
 
 from functools import partial
 # from kivy.lang import Builder
@@ -32,12 +33,10 @@ import datetime as dtm
 import random
 
 # Device settings
-#tty = '/dev/tty.usbserial-PXWV0AMC'
 VeAddr = 5
 IcAddr = 1
 IgAddr = 2
 
-from sys import platform as _platform
 if _platform == "linux" or _platform == "linux2":
     # linux
     tty = '/dev/ttyUSB0'
@@ -299,7 +298,7 @@ class MyRoot(BoxLayout):
                     Clock.schedule_interval(partial(self.hold_Volt, self.left_time), dt_op)
                     print('Now on hold voltage')
         # except IndexError:
-        elif self.seq_now == len[self.seq] -1:
+        elif self.seq_now == len(self.seq) -1:
             print('All sequences are finished. Measurement is now stopped.')
             self.abort_sequence()
 
@@ -316,8 +315,8 @@ class MyRoot(BoxLayout):
         """Retrun lapse time (hh:mm:ss format)
         """
         rh = (t-t%3600)/3600
-        rm = (t-((t-rh*3600)%60))/60
-        rs = t -rm*60
+        rm = (t-rh*3600-((t-rh*3600)%60))/60
+        rs = t%60
         return "{0:2.0f} [sub][i]H[/i][/sub] {1:2.0f} [sub][i]M[/i][/sub] {2:2.0f} [sub][i]S[/i][/sub]".format(rh,rm,rs)
 
     def total_time(self):
