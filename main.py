@@ -48,6 +48,8 @@ elif _platform == "win32":
     # tty =
     pass
 
+# Load sequence configuration
+from config import *
 
 # Prepare file
 directory = 'data/'
