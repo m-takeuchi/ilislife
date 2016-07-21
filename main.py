@@ -48,24 +48,7 @@ elif _platform == "win32":
     # tty =
     pass
 
-# Rc = 100e+3 # (ohm), Resistor for Faraday cup current
-# Rg = 100e+3 # (ohm), Resistor for Extractor current
-dV = 50 # (V)
-dt_meas = 1 #(s) measurement interval
-dt_op = 1 # (s) time per step for Ve change
-
-
-# list of [Voltage (V), holding time(s)]
-DT = 300 # (s) time per step for time-dependence measurement
-SEQ = [ [3000, DT],\
-        [3250, DT],\
-        [3500, DT],\
-        [3750, DT],\
-        [4000, DT],\
-        [4250, DT],\
-        [4500, DT],\
-        [4750, DT],\
-        [5000, 3600]]
+from config import *
 
 # Prepare file
 # filename = 'tmp.dat'
@@ -133,7 +116,6 @@ class MyRoot(BoxLayout):
 #                Ic_obj.Cls()
 #            self.Ve_status = str(self.volt_now)
         ### 以下追加条件
-
 
     def on_countup(self, dt):
         """Callback function for fetching measured values
