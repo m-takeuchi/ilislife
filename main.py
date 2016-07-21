@@ -57,14 +57,16 @@ dt_op = 1 # (s) time per step for Ve change
 
 # list of [Voltage (V), holding time(s)]
 DT = 300 # (s) time per step for time-dependence measurement
-SEQ = [ [3000, DT],\
-        [3250, DT],\
-        [3500, DT],\
-        [3750, DT],\
-        [4000, DT],\
-        [4250, DT],\
-        [4500, DT],\
-        [4750, DT],\
+#SEQ = [ [3000, DT],\
+#        [3250, DT],\
+#        [3500, DT],\
+#        [3750, DT],\
+#        [4000, DT],\
+#        [4250, DT],\
+#        [4500, DT],\
+#        [4750, DT],\
+#        [5000, 3600]]
+SEQ = [ [4750, DT],\
         [5000, 3600]]
 
 # Prepare file
@@ -275,7 +277,7 @@ class MyRoot(BoxLayout):
     def on_countdown(self, dt):
         """Callback for voltage sequence
         """
-        if self.seq_now < len(self.seq) -1:
+        if self.seq_now <= len(self.seq) -1:
             # print('I am in on_countdonw'+str(self.seq_now))
             # print(Clock.get_events())
             ### 現在電圧が現在シーケンス設定電圧より低い場合に電圧増加を実行
@@ -298,7 +300,7 @@ class MyRoot(BoxLayout):
                     Clock.schedule_interval(partial(self.hold_Volt, self.left_time), dt_op)
                     print('Now on hold voltage')
         # except IndexError:
-        elif self.seq_now == len(self.seq) -1:
+        elif self.seq_now > len(self.seq) -1:
             print('All sequences are finished. Measurement is now stopped.')
             self.abort_sequence()
 
