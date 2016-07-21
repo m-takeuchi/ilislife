@@ -35,8 +35,10 @@ MyRoot:
                     # size_hint_y: 0.2
                     markup: True
                 Label:
-                    text: str(root.seq_now)+',   '+str(root.seq[root.seq_now][0])+',  '+str(root.seq[root.seq_now][1])
+                    text: str(root.seq_now)+' [sub]th[/sub]   '+str(root.seq[root.seq_now][0])+' [sub]V[/sub]  '+str(root.seq[root.seq_now][1])+' [sub]s[/sub]'
                     # size_hint_y: 0.2
+                    markup: True
+
                 Label:
                     # text: str(root.time_now)
                     text: 'Ve : '

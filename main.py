@@ -57,13 +57,16 @@ dt_op = 1 # (s) time per step for Ve change
 
 
 # list of [Voltage (V), holding time(s)]
-DT = 60 # (s) time per step for time-dependence measurement
+DT = 300 # (s) time per step for time-dependence measurement
 SEQ = [ [3000, DT],\
-        [3200, DT],\
-        [3400, DT],\
-        [3600, DT],\
-        [3800, DT],\
-        [4000, 120]]
+        [3250, DT],\
+        [3500, DT],\
+        [3750, DT],\
+        [4000, DT],\
+        [4250, DT],\
+        [4500, DT],\
+        [4750, DT],\
+        [5000, 3600]]
 
 # Prepare file
 # filename = 'tmp.dat'
@@ -121,14 +124,15 @@ class MyRoot(BoxLayout):
 
 
         elif command == 'reset':
-            self.stop_timer()
-            self.time_now = 0
-            if self.is_connected:
-                msg = Ve_obj.Clear()
-                Ve_obj.ShutDown()
-                Ig_obj.Cls()
-                Ic_obj.Cls()
-            self.Ve_status = str(self.volt_now)
+            self.abort_sequence()
+#            self.stop_timer()
+#            self.time_now = 0
+#            if self.is_connected:
+#                msg = Ve_obj.Clear()
+#                Ve_obj.ShutDown()
+#                Ig_obj.Cls()
+#                Ic_obj.Cls()
+#            self.Ve_status = str(self.volt_now)
         ### 以下追加条件
 
 
@@ -189,7 +193,7 @@ class MyRoot(BoxLayout):
         self.Ve_status = 'Disconnected'
         self.Ic_status = 'Disconnected'
         self.Ig_status = 'Disconnected'
-        Ve_obj.ClosePort()
+        # Ve_obj.ClosePort()
         self.is_connected = False
 
     # def increment_Volt(self, dt):
@@ -235,11 +239,12 @@ class MyRoot(BoxLayout):
         self.volt_now = Ve_obj.AskVolt()*1000
         if self.volt_now == volt_target:
             return False
-        if self.volt_now < volt_target:
+        elif self.volt_now < volt_target:
             self.increment_Volt(volt_target, *largs)
-        if self.volt_now > volt_target:
+        elif self.volt_now > volt_target:
             self.decrement_Volt(volt_target, *largs)
         else:
+            print('End change_Volt')
             return False
 
 
@@ -271,7 +276,7 @@ class MyRoot(BoxLayout):
     def on_countdown(self, dt):
         """Callback for voltage sequence
         """
-        if self.seq_now < len[self.seq] -1:
+        if self.seq_now < len(self.seq) -1:
             # print('I am in on_countdonw'+str(self.seq_now))
             # print(Clock.get_events())
             ### 現在電圧が現在シーケンス設定電圧より低い場合に電圧増加を実行
@@ -282,6 +287,7 @@ class MyRoot(BoxLayout):
                     # イベントループに投入
                     self.is_changevolt = True
                     Clock.schedule_interval(partial(self.change_Volt, self.volt_target), dt_op)
+                    print('Now on change voltage')
 
 
             ### 現在電圧が現在シーケンス設定電圧と等しく, 電圧変更中でなく, hold_Volt中でない場合
@@ -291,6 +297,7 @@ class MyRoot(BoxLayout):
                     self.left_time = self.seq[self.seq_now][1] #left_timeにシーケンスリスト
                     # イベントループに投入
                     Clock.schedule_interval(partial(self.hold_Volt, self.left_time), dt_op)
+                    print('Now on hold voltage')
         # except IndexError:
         elif self.seq_now == len[self.seq] -1:
             print('All sequences are finished. Measurement is now stopped.')
@@ -332,18 +339,44 @@ class MyRoot(BoxLayout):
     def abort_sequence(self):
         """Force to abort measurement immediately
         """
-        events = Clock.get_events()
-        for ev in events:
-            Clock.unschedule(ev)
-
+        # events = Clock.get_events()
+        # for ev in events:
+        #    # Clock.unschedule(ev)
+        #    ev.cancel()
+        try:
+            Clock.unschedule(self.on_countup)
+        except:
+            print('abort_sequence error 1')
+            pass
+        try:
+            Clock.unschedule(self.on_countdown)
+        except:
+            print('abort_sequence error 2')
+            pass
+        try:
+            Clock.unschedule(self.change_Volt)
+        except:
+            print('abort_sequence error 3')
+            pass
+        try:
+            Clock.unschedule(self.hold_Volt)
+        except:
+            print('abort_sequence error 4')
+            pass
         self.is_countdown = False
         self.is_countup = False
         self.is_changevolt = False
+        self.is_sequence = False
+        self.is_changevolt = False
+        self.is_holdvolt = False
         if self.is_connected:
             msg = Ve_obj.Clear()
             Ve_obj.VoltZero()
+            Ve_obj.OutOff()
+            self.seq_now = 0
+            self.time_now = 0
             self.volt_now = Ve_obj.AskVolt()*1000
-            Ve_obj.ShutDown()
+            # Ve_obj.ShutDown()
             # Ig_obj.Cls()
             # Ic_obj.Cls()
         pass
