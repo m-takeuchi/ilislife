@@ -1,5 +1,12 @@
 from __future__ import division  # 少数点以下表示のためのモジュール
 
+### For logging to current dir/log_dir
+import os
+from kivy.config import Config
+Config.set('kivy', 'log_level', 'debug')
+Config.set('kivy', 'log_dir', os.path.dirname(os.path.abspath(__file__))+'/logs/')
+print(Config.get('kivy', 'log_dir'))
+
 from functools import partial
 # from kivy.lang import Builder
 from kivy.uix.widget import Widget
