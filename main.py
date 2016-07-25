@@ -443,6 +443,7 @@ class MyGraph(BoxLayout):
             # plot.points = [(0, 0),(1,0.5)]
             plot.points = [(0, 0)]
         # self.counter = 1
+    @classmethod
     def do_toggle(self):
         try:
             if not self.sensorEnabled:
