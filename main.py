@@ -11,6 +11,7 @@ Config.set('kivy', 'log_dir', os.path.dirname(os.path.abspath(__file__))+'/logs/
 from functools import partial
 # from kivy.lang import Builder
 from kivy.uix.widget import Widget
+# from kivy.uix.screenmanager import ScreenManager, Screen
 from kivy.uix.boxlayout import BoxLayout
 # from kivy.uix.stacklayout import StackLayout
 from kivy.uix.floatlayout import FloatLayout
@@ -57,9 +58,10 @@ filename = directory+"{0:%y%m%d-%H%M%S}.dat".format(dtm.datetime.now())
 with open(filename, mode = 'w', encoding = 'utf-8') as fh:
     fh.write('#date\ttime(s)\tVe(kV)\tIg(V)\tIc(V)\n')
 
+class MyRoot(TabbedPanel):
+    pass
 
-# class MyRoot(TabbedPanel):
-class MyRoot(BoxLayout):
+class MainView(BoxLayout):
     is_countup = BooleanProperty(False)
     is_sequence = BooleanProperty(False)
     is_connected = BooleanProperty(False)
@@ -103,19 +105,8 @@ class MyRoot(BoxLayout):
                 #######################
                 # else:
                     # print('Connect first')
-
-
         elif command == 'reset':
             self.abort_sequence()
-#            self.stop_timer()
-#            self.time_now = 0
-#            if self.is_connected:
-#                msg = Ve_obj.Clear()
-#                Ve_obj.ShutDown()
-#                Ig_obj.Cls()
-#                Ic_obj.Cls()
-#            self.Ve_status = str(self.volt_now)
-        ### 以下追加条件
 
     def on_countup(self, dt):
         """Callback function for fetching measured values
@@ -401,174 +392,124 @@ class StoreValue(BoxLayout):
         return app_time
 
 
-# class MyGraph(BoxLayout):
-#     sensorEnabled = BooleanProperty(False)
-#     plot = ListProperty([])
-#     graph_y_upl = NumericProperty(2)
-#     graph_y_lwl = NumericProperty(-1)
-#     graph_x_range = NumericProperty(100)
-#     graph_x_hist = NumericProperty(0)
-#     graph_x_step = NumericProperty(10)
-#     data_buffer = ListProperty([[],[],[]])
-#     BUFFSIZE = 10000
-#     to_val = ListProperty([])
-#     def __init__(self, **kwargs):
-#         super().__init__(**kwargs)
-#     #     Clock.schedule_once(self.prepare_graph,0)
-#     # def prepare_graph(self, dt):
-#     #     graph = Graph(\
-#     #         label_options={'color': (1, 1, 1, 0.9), 'bold': True},\
-#     #         background_color=(0.1, 0.1, 0.1, 1),\
-#     #         tick_color=(1, 0, 1, 1),\
-#     #         border_color=(1, 0, 1, 1),\
-#     #         xlabel='Time (s)',\
-#     #         # self.xlabel=str(self.ids),\
-#     #         ylabel='Values',\
-#     #         y_grid_label=True,\
-#     #         x_grid_label=True,\
-#     #         padding=5,\
-#     #         x_ticks_major=10,\
-#     #         x_grid=True,\
-#     #         y_grid=True,\
-#     #         xmin = self.graph_x_range  - self.graph_x_hist,\
-#     #         xmax = 0 - self.graph_x_hist,\
-#     #         ymin = self.graph_y_lwl,\
-#     #         ymax = self.graph_y_upl)
-#         #
-#         # # 描画サイズ変数の定義
-#         # size_root_x =1; size_root_y =1
-#         # size_graph_x = 0.9; size_graph_y =0.9
-#         # size_rlbl_x = size_root_x - size_graph_x
-#         # size_rlbl_y = (size_root_y - size_graph_y)/3.
-#         # size_rbtn_x = size_root_x - size_graph_x
-#         # size_rbtn_y = 2*size_rlbl_y
-#         #
-#         # # 描画位置変数の定義
-#         # pos_rlbl1 = 0.99
-#         # pd = 0.1
-#         # pos_rbtn1 = size_root_y-size_rbtn_y
-#         # pos_rbtn2 = pos_rbtn1 - size_rbtn_y
-#         # pos_rlbl2 = pos_rbtn2 - size_rbtn_y - pd
-#         # pos_rbtn3 = pos_rlbl2 - size_rbtn_y
-#         # pos_rbtn4 = pos_rbtn3 - size_rbtn_y
-#         # pos_rbtn5 = pos_rbtn4 - size_rbtn_y - pd
-#         # # Graphウィジェットの相対位置, 相対サイズ
-#         # graph.pos_hint = {'top': 1}
-#         # graph.size_hint = (size_graph_x,size_graph_y)
-#
-#         # ### Indicator of Uppper level
-#         # lbl_upl = Label(text=str(self.graph_y_upl), size_hint=(size_rlbl_x,size_rlbl_y), pos_hint={'top':pos_rlbl1, 'right':1} )
-#         # # lbl_upl.bind()
-#         # ### buttons for y upper level
-#         # bt1up = Button(text='+ UPL', size_hint=(size_rbtn_x,size_rbtn_y), pos_hint={'top':pos_rbtn1,'right':1})
-#         # bt1up.bind(on_press=self.up_y_upl)
-#         # bt1down = Button(text='- UPL', size_hint=(size_rbtn_x,size_rbtn_y), pos_hint={'top':pos_rbtn2,'right':1})
-#         # bt1down.bind(on_press=self.down_y_upl)
-#         #
-#         # ### Indicator of Lower level
-#         # lbl_lwl = Label(text=str(self.graph_y_lwl), size_hint=(size_rlbl_x,size_rlbl_y), pos_hint={'top':pos_rlbl2, 'right':1})
-#         # ### buttons for y lower level
-#         # bt2up = Button(text='+ UPL', size_hint=(size_rbtn_x,size_rbtn_y), pos_hint={'top':pos_rbtn3,'right':1})
-#         # bt2up.bind(on_press=self.up_y_lwl)
-#         # bt2down = Button(text='- UPL', size_hint=(size_rbtn_x,size_rbtn_y), pos_hint={'top':pos_rbtn4,'right':1})
-#         # bt2down.bind(on_press=self.down_y_lwl)
-#         #
-#         # bttg = Button(text='do_toggle', size_hint=(size_rbtn_x,size_rbtn_y), pos_hint={'top':pos_rbtn5, 'right':1})
-#         # bttg.bind(on_press=self.do_toggle)
-#         #
-#         # s = Slider(y=0, pos_hint={'x': .5}, size_hint=(.7, None), height=50)
-#         # # s.bind(value=self._set_bezier_dash_offset)
-#         # self.add_widget(graph)
-#         # self.add_widget(lbl_upl)
-#         # self.add_widget(bt1up)
-#         # self.add_widget(bt1down)
-#         # self.add_widget(lbl_lwl)
-#         # self.add_widget(bt2up)
-#         # self.add_widget(bt2down)
-#         # self.add_widget(bttg)
-#
-#         # self.graph = self.graph_plot
-#
-#         # self.plot.append(MeshLinePlot(color=[1, 0, 0, 1]))  # X - Red
-#         # self.plot.append(MeshLinePlot(color=[0, 1, 0, 1]))  # Y - Green
-#         # self.plot.append(MeshLinePlot(color=[0, 0.5, 1, 1]))  # Z - Blue
-#         # self.reset_plots()
-#         # for plot in self.plot:
-#         #     self.graph.add_plot(plot) # Add MeshLinePlot object of garden.graph into Graph()
-#         #     # graph.add_plot(plot) # Add MeshLinePlot object of garden.graph into Graph()
-#
-#
-#     # def up_y_upl(self, instance):
-#     def up_y_upl(self):
-#         self.graph_y_upl += 1
-#     # def down_y_upl(self, instance):
-#     def down_y_upl(self):
-#         if (self.graph_y_upl -1 > self.graph_y_lwl):
-#             self.graph_y_upl -= 1
-#     # def up_y_lwl(self, instance):
-#     def up_y_lwl(self):
-#         if (self.graph_y_upl -1 > self.graph_y_lwl):
-#             self.graph_y_lwl += 1
-#     # def down_y_lwl(self, instance):
-#     def down_y_lwl(self):
-#         self.graph_y_lwl -= 1
-#
-#     def reset_plots(self):
-#         for plot in self.plot:
-#             # plot.points = [(0, 0),(1,0.5)]
-#             plot.points = [(0, 0)]
-#
-#     def do_toggle(self):
-#     # def do_toggle(self, instance):
-#         try:
-#             if not self.sensorEnabled:
-#                 Clock.schedule_interval(self.get_mydata, 10 / 10.)
-#                 self.sensorEnabled = True
-#             else:
-#                 Clock.unschedule(self.get_mydata)
-#                 self.sensorEnabled = False
-#         except NotImplementedError:
-#                 popup = ErrorPopup()
-#                 popup.open()
-#
-#     def get_mydata(self, dt):
-#         self.to_val = val = self._make_random_data()
-#         # self.to_val = val
-#         # gr.make_random_data()
-#         if len(self.data_buffer[0]) > self.BUFFSIZE:
-#             del(self.data_buffer[0][0]) # バッファがサイズを越えたら古いvalから削除
-#             del(self.data_buffer[1][0]) # バッファがサイズを越えたら古いvalから削除
-#             del(self.data_buffer[2][0]) # バッファがサイズを越えたら古いvalから削除
-#         if(not val == (None, None, None)):
-#             self.data_buffer[0].append(val[0]) # バッファにデータを追加
-#             self.data_buffer[1].append(val[1]) # バッファにデータを追加
-#             self.data_buffer[2].append(val[2]) # バッファにデータを追加
-#             ### 時間t を設定
-#             buff_len = len(self.data_buffer[0])
-#             t = list(range(buff_len))[::-1]
-#
-#             # for i, p in enumerate(self.plot):
-#                 # self.plot[i].points = self.T_list(t, self.data_buffer[i][-buff_len:]) #リストの転置
-#             self.plot[0].points = self.T_list(t, self.data_buffer[0][-buff_len:])
-#             self.plot[1].points = self.T_list(t, self.data_buffer[1][-buff_len:])
-#             self.plot[2].points = self.T_list(t, self.data_buffer[2][-buff_len:])
-#             print(self.graph_y_upl,self.graph_y_lwl)
-#
-#     def T_list(self, x, y):
-#          #リストの転置
-#         return list(map(list, zip(*[x, y] )))
-#     def format_val(self, val):
-#         return '{0:.3f}'.format(val)
-#     def _make_random_data(self):
-#         ## valに値を代入する. 例では乱数を入れている.
-#         self.val = [random.random()+0.2, random.random(), random.random()-0.2]
-#         return self.val
+class MyGraph(BoxLayout):
+# class Hoge(Graph):
+    graph_plot = ObjectProperty(None)
+    sensorEnabled = BooleanProperty(False)
+    graph_y_upl = NumericProperty(2)
+    graph_y_lwl = NumericProperty(-1)
+    graph_x_range = NumericProperty(100)
+    graph_x_hist = NumericProperty(0)
+    graph_x_step = NumericProperty(10)
+    data_buffer = ListProperty([[],[],[]])
+    BUFFSIZE = 1000000
+    to_val = ListProperty([])
+
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        Clock.schedule_once(self.prepare_graph,0)
+
+    def prepare_graph(self, dt):
+        self.graph = self.graph_plot
+        # self.graph = self.ids.graph_plot
+        print('**************************')
+        print(self.graph)
+        print('**************************')
+        self.plot = []
+        self.plot.append(MeshLinePlot(color=[1, 0, 0, 1]))  # X - Red
+        self.plot.append(MeshLinePlot(color=[0, 1, 0, 1]))  # Y - Green
+        self.plot.append(MeshLinePlot(color=[0, 0.5, 1, 1]))  # Z - Blue
+        self.reset_plots()
+        for plot in self.plot:
+            self.graph.add_plot(plot) # Add MeshLinePlot object of garden.graph into Graph()
+            # graph.add_plot(plot) # Add MeshLinePlot object of garden.graph into Graph()
+
+    def ymin_up(self):
+        if (self.graph_y_upl -1 > self.graph_y_lwl):
+            self.graph_y_lwl += 1
+    def ymax_down(self):
+        if (self.graph_y_upl -1 > self.graph_y_lwl):
+            self.graph_y_upl -= 1
+    def reset_plots(self):
+        for plot in self.plot:
+            # plot.points = [(0, 0),(1,0.5)]
+            plot.points = [(0, 0)]
+        # self.counter = 1
+    def do_toggle(self):
+        try:
+            if not self.sensorEnabled:
+                Clock.schedule_interval(self.get_mydata, 1 / 10.)
+                self.sensorEnabled = True
+            else:
+                Clock.unschedule(self.get_mydata)
+                self.sensorEnabled = False
+        except NotImplementedError:
+                popup = ErrorPopup()
+                popup.open()
+    def get_mydata(self, dt):
+        # self.to_val = val = GetValue.make_random_data()
+        self.to_val = val = self._make_random_data()
+
+        if len(self.data_buffer[0]) > self.BUFFSIZE:
+            del(self.data_buffer[0][0]) # バッファがサイズを越えたら古いvalから削除
+            del(self.data_buffer[1][0]) # バッファがサイズを越えたら古いvalから削除
+            del(self.data_buffer[2][0]) # バッファがサイズを越えたら古いvalから削除
+        if(not val == (None, None, None)):
+            self.data_buffer[0].append(val[0]) # バッファにデータを追加
+            self.data_buffer[1].append(val[1]) # バッファにデータを追加
+            self.data_buffer[2].append(val[2]) # バッファにデータを追加
+            ### 時間t を設定
+            buff_len = len(self.data_buffer[0])
+            t = list(range(buff_len))[::-1]
+            # print(len(t), len(self.data_buffer[0][-buff_len:]),\
+            #               len(self.data_buffer[1][-buff_len:]),\
+            #               len(self.data_buffer[2][-buff_len:]))
+
+            # tmp =  [t, self.data_buffer[0], self.data_buffer[1], self.data_buffer[2]] # 時間tリストを先頭に追加
+            output1 = list(map(list, zip(*[t, self.data_buffer[0][-buff_len:]] ))) #リストの転置
+            output2 = list(map(list, zip(*[t, self.data_buffer[1][-buff_len:]] ))) #リストの転置
+            output3 = list(map(list, zip(*[t, self.data_buffer[2][-buff_len:]] ))) #リストの転置
+            # print(output)
+            self.plot[0].points = output1
+            self.plot[1].points = output2
+            self.plot[2].points = output3
+            # print(self.plot)
+    def format_val(self, val):
+        return '{0:.3f}'.format(val)
+    def _make_random_data(self):
+        ## valに値を代入する. 例では乱数を入れている.
+        self.val = [random.random()+0.2, random.random(), random.random()-0.2]
+        return self.val
+
+
+
+class StoreValue(BoxLayout):
+    """Store measured values to file
+    """
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
+    @classmethod
+    def append_to_file(cls, filename, data1d):
+        ## ファイルにデータ書き込み
+        datastr = ''
+        with open(filename, mode = 'a', encoding = 'utf-8') as fh:
+            for data in data1d:
+                datastr += '\t'+str(data)
+            fh.write(str(cls.get_ctime()) + datastr + '\n')
+    @classmethod
+    def get_ctime(self):
+        t = dtm.datetime.now()
+        point = (t.microsecond - t.microsecond%10000)/10000
+        app_time = "{0:%y%m%d-%H:%M:%S}.{1:.0f}".format(t, point)
+        return app_time
+
 
 
 class IlislifeApp(App):
-    def build(self):
-        return MyRoot()
     pass
+
 
 if __name__ == '__main__':
     IlislifeApp().run()

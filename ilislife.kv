@@ -1,10 +1,28 @@
+#Ilislife.kv
 #:kivy 1.9.1
 
+# MyRoot:
+#     BoxLayout:
+#         orientation: 'horizontal'
+#         MyGraph:
+#             id: gp
+#         MainView:
 
 MyRoot:
-    # MyRoot:
+    do_default_tab: False
+    TabbedPanelItem:
+        id: tab1
+        text: 'Main'
+        MainView:
+    TabbedPanelItem:
+        id: tab2
+        text: 'Graph'
+        MyGraph:
+            id: gp
+        # Graph:
+        # StoreValue:
 
-<MyRoot>:
+<MainView>:
     BoxLayout:
         ### Indicators (top) and Buttons (bottom)
         orientation: 'vertical'
@@ -59,7 +77,7 @@ MyRoot:
                 Label:
                     text: str(root.Ig_status)+' (V)/Rs'
                     # size_hint_y: 0.2
-            ## StoreValue:
+            # StoreValue:
             # BoxLayout:
             #     orientation: 'vertical'
             #     size_hint_x: 0.5
@@ -87,159 +105,128 @@ MyRoot:
                 font_size: 32
                 on_press: root.on_command('reset') if root.is_connected else None
 
-<StoreValue>:
+<MyGraph>:
+    graph_plot: graph_plot
     BoxLayout:
         orientation: 'vertical'
-        Label:
-            text: 'Save to:'
-            size_hint_y: 0.1
+        BoxLayout:
+            orientation: 'horizontal'
+            size_hint_y: 0.8
+            Graph:
+                id: graph_plot
+                background_color: (0.1, 0.1, 0.1, 1)
+                label_options: {'color': (1, 1, 1, 0.9), 'bold': True}
+                tick_color: (1, 0, 1, 1)
+                border_color: (1, 0, 1, 1)
+                xlabel:'Time (s)'
+                ylabel:'Values'
+                y_grid_label: True
+                x_grid_label: True
+                padding: 5
+                x_ticks_major: 10
+                x_grid: True
+                y_grid: True
+                xmin: root.graph_x_range  - root.graph_x_hist
+                xmax: 0 - root.graph_x_hist
+                ymin: root.graph_y_lwl
+                ymax: root.graph_y_upl
+                # size: self.parent.size
+                # pos: self.parent.pos
+            BoxLayout:
+                orientation: 'vertical'
+                size_hint_x: 0.05
+                Label:
+                    size_hint_y: 0.05
+                    text: str(root.graph_y_upl)
+                Button:
+                    id: bt1up
+                    text: '+ UPL'
+                    size_hint_y: 0.2
+                    on_press: root.graph_y_upl += 1
+                Button:
+                    id: bt1down
+                    text: '- UPL'
+                    size_hint_y: 0.2
+                    on_press: root.ymax_down()
+                Label:
+                    size_hint_y: 0.05
+                    text: str(root.graph_y_lwl)
+                Button:
+                    id: bt2up
+                    text: '+ LWL'
+                    size_hint_y: 0.2
+                    on_press: root.ymin_up()
+                Button:
+                    id: bt2down
+                    text: '- LWL'
+                    size_hint_y: 0.2
+                    on_press: root.graph_y_lwl -= 1
+
+
+        BoxLayout:
+            orientation: 'horizontal'
+            size_hint_y: 0.05
+            Label:
+                color: (1, 0, 0, 1)
+                text: 'Ve (kV)'
+                size_hint_x: 0.3
+            Label:
+                color: (1, 0, 0, 1)
+                text: root.format_val(root.to_val[0]) if not root.to_val == [] else ''
+                size_hint_x: 0.1
+            Label:
+                size_hint_x: 0.1
+            Label:
+                color: (0, 1, 0, 1)
+                text: 'Ig (V)'
+                size_hint_x: 0.3
+            Label:
+                color: (0, 1, 0, 1)
+                text: root.format_val(root.to_val[1]) if not root.to_val == [] else ''
+                size_hint_x: 0.1
+            Label:
+                size_hint_x: 0.1
+            Label:
+                color: (0, 0.5, 1, 1)
+                text: 'Ic (V)'
+                size_hint_x: 0.3
+            Label:
+                color: (0, 0.5, 1, 1)
+                text: root.format_val(root.to_val[2]) if not root.to_val == [] else ''
+                size_hint_x: 0.1
+
         BoxLayout:
             orientation: 'horizontal'
             size_hint_y: 0.1
+            Slider:
+                id: sd1
+                max: 600
+                min: 10
+                step: root.graph_x_step
+                value: root.graph_x_range
+                on_value: root.graph_x_range = self.value
+                size_hint_x: 0.9
             Label:
-                text: 'hoge'
-                size_hint_x: 0.6
-            Button:
-                text: 'OK'
-                size_hint_x: 0.4
-
-
-    # TabbedPanelItem:
-    #     id: tab2
-    #     text: 'Chart'
-    #     MyGraph:
-
-
-
-# <MyGraphh>:
-    # BoxLayout:
-    #     orientation: 'vertical'
-    #     size: root.size
-    # BoxLayout:
-    #     # size_hint_y: 0.8
-    #     orientation: 'horizontal'
-
-        # Graph:
-            # id: graph_plot
-            # # pos: self.parent.pos
-            # # size: self.parent.size*0.8
-            # size_hint_x: 0.95
-            # background_color: (0.1, 0.1, 0.1, 1)
-            # label_options: {'color': (1, 1, 1, 0.9), 'bold': True}
-            # tick_color: (1, 0, 1, 1)
-            # border_color: (1, 0, 1, 1)
-            # xlabel:'Time (s)'
-            # ylabel:'Values'
-            # y_grid_label: True
-            # x_grid_label: True
-            # padding: 5
-            # x_ticks_major: 10
-            # x_grid: True
-            # y_grid: True
-            # xmin: root.graph_x_range  - root.graph_x_hist
-            # xmax: 0 - root.graph_x_hist
-            # ymin: root.graph_y_lwl
-            # ymax: root.graph_y_upl
-
-        # BoxLayout:
-        #     orientation: 'vertical'
-        #     Label:
-        #         size_hint_y: 0.05
-        #         text: str(root.graph_y_upl)
-        #         # text: str(root.graph_prop)
-        #     Button:
-        #         id: bt1up
-        #         text: '+ UPL'
-        #         size_hint_y: 0.2
-        #         on_press: root.graph_y_upl += 1
-        #     Button:
-        #         id: bt1down
-        #         text: '- UPL'
-        #         size_hint_y: 0.2
-        #         on_press: root.down_y_upl()
-        #     Label:
-        #         size_hint_y: 0.05
-        #         text: str(root.graph_y_lwl)
-        #     Button:
-        #         id: bt2up
-        #         text: '+ LWL'
-        #         size_hint_y: 0.2
-        #         on_press: root.up_y_lwl()
-        #     Button:
-        #         id: bt2down
-        #         text: '- LWL'
-        #         size_hint_y: 0.2
-        #         on_press: root.graph_y_lwl -= 1
-
-#         BoxLayout:
-#             orientation: 'vertical'
-#             size_hint_x: 0.05
-#             BoxLayout:
-#                 orientation: 'horizontal'
-#                 size_hint_y: 0.05
-#                 Label:
-#                     color: (1, 0, 0, 1)
-#                     text: 'Ve (kV)'
-#                     # text: str(root.graph_prop)
-#                     size_hint_x: 0.3
-#                 Label:
-#                     color: (1, 0, 0, 1)
-#                     text: root.format_val(root.to_val[0]) if not root.to_val == [] else ''
-#                     size_hint_x: 0.1
-#                 Label:
-#                     size_hint_x: 0.1
-#                 Label:
-#                     color: (0, 1, 0, 1)
-#                     text: 'Ig (V)'
-#                     size_hint_x: 0.3
-#                 Label:
-#                     color: (0, 1, 0, 1)
-#                     text: root.format_val(root.to_val[1]) if not root.to_val == [] else ''
-#                     size_hint_x: 0.1
-#                 Label:
-#                     size_hint_x: 0.1
-#                 Label:
-#                     color: (0, 0.5, 1, 1)
-#                     text: 'Ic (V)'
-#                     size_hint_x: 0.3
-#                 Label:
-#                     color: (0, 0.5, 1, 1)
-#                     text: root.format_val(root.to_val[2]) if not root.to_val == [] else ''
-#                     size_hint_x: 0.1
-#             BoxLayout:
-#                 orientation: 'horizontal'
-#                 size_hint_y: 0.1
-#                 Slider:
-#                     id: sd1
-#                     max: 600
-#                     min: 10
-#                     step: root.graph_x_step
-#                     value: root.graph_x_range
-#                     on_value: root.graph_x_range = self.value
-#                     size_hint_x: 0.9
-#                 Label:
-#                     text: str(root.graph_x_range)+' range'
-#                     size_hint_x: 0.1
-#             BoxLayout:
-#                 orientation: 'horizontal'
-#                 size_hint_y: 0.1
-#                 Slider:
-#                     id: sd2
-#                     max: 0
-#                     min: -600
-#                     step: 10
-#                     value: root.graph_x_hist
-#                     on_value: root.graph_x_hist = self.value
-#                     size_hint_x: 0.9
-#                 Label:
-#                     text: str(root.graph_x_hist)+' hist'
-#                     size_hint_x: 0.1
-#             Label:
-#                 size_hint_y: 0.05
-#
-#             Button:
-#                 id: toggle_button
-#                 text: 'Stop Chart' if root.sensorEnabled else 'Start Chart'
-#                 size_hint_y: 0.1
-#                 # on_press: root.graph_prop.do_toggle()
-#                 on_press: root.do_toggle()
+                text: str(root.graph_x_range)+' range'
+                size_hint_x: 0.1
+        BoxLayout:
+            orientation: 'horizontal'
+            size_hint_y: 0.1
+            Slider:
+                id: sd2
+                max: 0
+                min: -600
+                step: 10
+                value: root.graph_x_hist
+                on_value: root.graph_x_hist = self.value
+                size_hint_x: 0.9
+            Label:
+                text: str(root.graph_x_hist)+' hist'
+                size_hint_x: 0.1
+        Label:
+            size_hint_y: 0.05
+        Button:
+            id: toggle_button
+            text: 'Stop Chart' if root.sensorEnabled else 'Start Chart'
+            size_hint_y: 0.1
+            on_press: root.do_toggle()
