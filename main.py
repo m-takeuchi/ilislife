@@ -1,3 +1,5 @@
+#!/usr/bin/python3
+
 from __future__ import division  # 少数点以下表示のためのモジュール
 
 ### For logging to current dir/log_dir
