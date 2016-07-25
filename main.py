@@ -76,6 +76,9 @@ class MainView(BoxLayout):
     Ve_status = StringProperty('Ve')
     Ic_status = StringProperty('Ic')
     Ig_status = StringProperty('Ig')
+    Ve_value =  NumericProperty()
+    Ig_value =  NumericProperty()
+    Ic_value =  NumericProperty()
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -102,6 +105,7 @@ class MainView(BoxLayout):
                 # self.Start_IncVolt(1000, dt)
                 self.start_timer()
                 self.start_sequence(self.seq)
+                MyGraph.do_toggle()
                 #######################
                 # else:
                     # print('Connect first')
@@ -112,18 +116,18 @@ class MainView(BoxLayout):
         """Callback function for fetching measured values
         """
         try:
-            Ig_value = Ig_obj.Measure()
-            Ic_value = Ic_obj.Measure()
-            self.Ic_status = str(Ic_value)
-            self.Ig_status = str(Ig_value)
+            self.Ig_value = Ig_obj.Measure()
+            self.Ic_value = Ic_obj.Measure()
+            self.Ic_status = str(self.Ic_value)
+            self.Ig_status = str(self.Ig_value)
         except ValueError:
-            Ig_value = '='
-            Ic_value = '='
+            self.Ig_value = 0
+            self.Ic_value = 0
             self.Ic_status = Ic_obj.ClearBuffer()
             self.Ig_status = Ig_obj.ClearBuffer()
-        Ve_value = self.volt_now
+        self.Ve_value = self.volt_now
         ### データをファイルに追記
-        StoreValue.append_to_file(filename, [self.time_now, Ve_value, Ig_value, Ic_value])
+        StoreValue.append_to_file(filename, [self.time_now, self.Ve_value, self.Ig_value, self.Ic_value])
         self.time_now += 1
 
     def start_timer(self):
@@ -439,7 +443,7 @@ class MyGraph(BoxLayout):
     def do_toggle(self):
         try:
             if not self.sensorEnabled:
-                Clock.schedule_interval(self.get_mydata, 1 / 10.)
+                Clock.schedule_interval(self.get_mydata, dt_meas)
                 self.sensorEnabled = True
             else:
                 Clock.unschedule(self.get_mydata)
@@ -449,7 +453,8 @@ class MyGraph(BoxLayout):
                 popup.open()
     def get_mydata(self, dt):
         # self.to_val = val = GetValue.make_random_data()
-        self.to_val = val = self._make_random_data()
+        # self.to_val = val = self._make_random_data()
+        self.to_val = val = [self.Ve_value, self.Ig_value, self.Ic_value]
 
         if len(self.data_buffer[0]) > self.BUFFSIZE:
             del(self.data_buffer[0][0]) # バッファがサイズを越えたら古いvalから削除
