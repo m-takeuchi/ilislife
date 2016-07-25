@@ -463,10 +463,10 @@ class MyGraph(BoxLayout):
         # print(last)
         # with open(filename, mode = 'r', encoding = 'utf-8') as fh:
             # last = fh.readlines()[-1].rsplit('\n')[0].split('\t')[2:]
-        ve = float(last[0])
-        ig = float(last[1])
-        ic = float(last[2])
-        return [ve/1000,ig,ic]
+        ve = float(last[0])/1000.
+        ig = float(last[1])*1000
+        ic = float(last[2])*1000
+        return [ve,ig,ic]
 
 
     def get_mydata(self, dt):
