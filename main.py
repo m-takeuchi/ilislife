@@ -1,4 +1,5 @@
 #!/usr/bin/python3
+# -*- coding: utf-8 -*-
 
 from __future__ import division  # 少数点以下表示のためのモジュール
 
