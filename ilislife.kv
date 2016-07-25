@@ -23,6 +23,7 @@ MyRoot:
         # StoreValue:
 
 <MainView>:
+    # main_view: main_view
     BoxLayout:
         ### Indicators (top) and Buttons (bottom)
         orientation: 'vertical'
@@ -200,8 +201,8 @@ MyRoot:
             size_hint_y: 0.1
             Slider:
                 id: sd1
-                max: 600
-                min: 10
+                max: 86400
+                min: 600
                 step: root.graph_x_step
                 value: root.graph_x_range
                 on_value: root.graph_x_range = self.value
@@ -215,18 +216,18 @@ MyRoot:
             Slider:
                 id: sd2
                 max: 0
-                min: -600
-                step: 10
+                min: -604800
+                step: 60
                 value: root.graph_x_hist
                 on_value: root.graph_x_hist = self.value
                 size_hint_x: 0.9
             Label:
                 text: str(root.graph_x_hist)+' hist'
                 size_hint_x: 0.1
-        # Label:
-            # size_hint_y: 0.05
-        # Button:
-        #     id: toggle_button
-        #     text: 'Stop Chart' if root.sensorEnabled else 'Start Chart'
-        #     size_hint_y: 0.1
-        #     on_press: root.do_toggle()
+        Label:
+            size_hint_y: 0.05
+        Button:
+            id: toggle_button
+            text: 'Stop Chart' if root.sensorEnabled else 'Start Chart'
+            size_hint_y: 0.1
+            on_press: root.do_toggle()

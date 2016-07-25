@@ -108,7 +108,7 @@ class MainView(BoxLayout):
                 # self.Start_IncVolt(1000, dt)
                 self.start_timer()
                 self.start_sequence(self.seq)
-                MyGraph.do_toggle()
+                # MyGraph.do_toggle()
                 #######################
                 # else:
                     # print('Connect first')
@@ -217,6 +217,7 @@ class MainView(BoxLayout):
         """
         self.volt_now = Ve_obj.AskVolt()*1000
         if self.volt_now == volt_target:
+            self.is_changevolt = False
             return False
         elif self.volt_now < volt_target:
             self.increment_Volt(volt_target, *largs)
@@ -257,10 +258,8 @@ class MainView(BoxLayout):
         """
         if self.seq_now <= len(self.seq) -1:
             # print('I am in on_countdonw'+str(self.seq_now))
-            # print(Clock.get_events())
-            ### 現在電圧が現在シーケンス設定電圧より低い場合に電圧増加を実行
             self.volt_target = self.seq[self.seq_now][0]
-            if self.volt_now < self.volt_target:
+            if self.volt_now != self.volt_target:
                 ### 電圧変更中でない場合
                 if not self.is_changevolt:
                     # イベントループに投入
@@ -325,14 +324,18 @@ class MainView(BoxLayout):
     def abort_sequence(self):
         """Force to abort measurement immediately
         """
+        self.is_countup = False
+        self.is_changevolt = False
+        self.is_sequence = False
+        self.is_holdvolt = False
         # events = Clock.get_events()
         # for ev in events:
         #    # Clock.unschedule(ev)
         #    ev.cancel()
         try:
-            Clock.unschedule(self.on_countup)
+            Clock.unschedule(self.change_Volt)
         except:
-            print('abort_sequence error 1')
+            print('abort_sequence error 3')
             pass
         try:
             Clock.unschedule(self.on_countdown)
@@ -340,21 +343,16 @@ class MainView(BoxLayout):
             print('abort_sequence error 2')
             pass
         try:
-            Clock.unschedule(self.change_Volt)
+            Clock.unschedule(self.on_countup)
         except:
-            print('abort_sequence error 3')
+            print('abort_sequence error 1')
             pass
         try:
             Clock.unschedule(self.hold_Volt)
         except:
             print('abort_sequence error 4')
             pass
-        self.is_countdown = False
-        self.is_countup = False
-        self.is_changevolt = False
-        self.is_sequence = False
-        self.is_changevolt = False
-        self.is_holdvolt = False
+
         if self.is_connected:
             msg = Ve_obj.Clear()
             Ve_obj.VoltZero()
@@ -411,6 +409,9 @@ class MyGraph(BoxLayout):
     data_buffer = ListProperty([[],[],[]])
     BUFFSIZE = 1000000
     to_val = ListProperty([])
+    Ve_value =  NumericProperty()
+    Ig_value =  NumericProperty()
+    Ic_value =  NumericProperty()
 
 
     def __init__(self, **kwargs):
@@ -443,10 +444,11 @@ class MyGraph(BoxLayout):
             # plot.points = [(0, 0),(1,0.5)]
             plot.points = [(0, 0)]
         # self.counter = 1
-    @classmethod
+
     def do_toggle(self):
         try:
             if not self.sensorEnabled:
+                print('excuted do_toggle()',dt_meas)
                 Clock.schedule_interval(self.get_mydata, dt_meas)
                 self.sensorEnabled = True
             else:
@@ -455,10 +457,24 @@ class MyGraph(BoxLayout):
         except NotImplementedError:
                 popup = ErrorPopup()
                 popup.open()
+
+    def read_file(self, filename):
+        last = os.popen('tail -1 '+filename).read().rsplit('\n')[0].split('\t')[2:] ### Implement
+        # print(last)
+        # with open(filename, mode = 'r', encoding = 'utf-8') as fh:
+            # last = fh.readlines()[-1].rsplit('\n')[0].split('\t')[2:]
+        ve = float(last[0])
+        ig = float(last[1])
+        ic = float(last[2])
+        return [ve/1000,ig,ic]
+
+
     def get_mydata(self, dt):
         # self.to_val = val = GetValue.make_random_data()
         # self.to_val = val = self._make_random_data()
-        self.to_val = val = [self.Ve_value, self.Ig_value, self.Ic_value]
+        last = self.read_file(filename) ## Read from data file
+        self.to_val = val = last
+
 
         if len(self.data_buffer[0]) > self.BUFFSIZE:
             del(self.data_buffer[0][0]) # バッファがサイズを越えたら古いvalから削除
@@ -518,6 +534,10 @@ class StoreValue(BoxLayout):
 
 class IlislifeApp(App):
     pass
+    # def build(self):
+        # self.screens["wordcomp"].bind(count_r=self.screens["score"].setter('score'))
+        # self.MyGraph(app=self).bind(Ve_value=self.MainView(app=self).setter('Ve_value'))
+        # return MyRoot()
 
 
 if __name__ == '__main__':
