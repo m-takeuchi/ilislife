@@ -216,8 +216,8 @@ MyRoot:
             size_hint_y: 0.1
             Slider:
                 id: sd1
-                max: 86400
-                min: 600
+                max: 43200
+                min: 0
                 step: root.graph_x_step
                 value: root.graph_x_range
                 on_value: root.graph_x_range = self.value
@@ -231,8 +231,8 @@ MyRoot:
             Slider:
                 id: sd2
                 max: 0
-                min: -604800
-                step: 60
+                min: -43200
+                step: root.graph_x_step
                 value: root.graph_x_hist
                 on_value: root.graph_x_hist = self.value
                 size_hint_x: 0.9

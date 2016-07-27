@@ -16,9 +16,6 @@ from functools import partial
 from kivy.uix.widget import Widget
 # from kivy.uix.screenmanager import ScreenManager, Screen
 from kivy.uix.boxlayout import BoxLayout
-# from kivy.uix.stacklayout import StackLayout
-from kivy.uix.floatlayout import FloatLayout
-from kivy.uix.gridlayout import GridLayout
 from kivy.uix.slider import Slider
 from kivy.uix.tabbedpanel import TabbedPanel
 from kivy.uix.textinput import TextInput
@@ -35,6 +32,7 @@ import hioki
 from kivy.properties import StringProperty
 import datetime as dtm
 import random
+import numpy as np
 
 # Device settings
 VeAddr = 5
@@ -131,6 +129,8 @@ class MainView(BoxLayout):
         self.Ve_value = self.volt_now
         ### データをファイルに追記
         StoreValue.append_to_file(filename, [self.time_now, self.Ve_value, self.Ig_value, self.Ic_value])
+        ### データをMyGraphに送る
+        MyGraph.to_val = [self.time_now, self.Ve_value, self.Ig_value, self.Ic_value]
         self.time_now += 1
 
     def start_timer(self):
@@ -375,42 +375,21 @@ class MainView(BoxLayout):
         self.is_countup = False
         pass
 
-# class StoreValue(BoxLayout):
-#     """Store measured values to file
-#     """
-#     def __init__(self, **kwargs):
-#         super().__init__(**kwargs)
-#
-#     @classmethod
-#     def append_to_file(cls, filename, data1d):
-#         ## ファイルにデータ書き込み
-#         datastr = ''
-#         with open(filename, mode = 'a', encoding = 'utf-8') as fh:
-#             for data in data1d:
-#                 datastr += '\t'+str(data)
-#             fh.write(str(cls.get_ctime()) + datastr + '\n')
-#     @classmethod
-#     def get_ctime(self):
-#         t = dtm.datetime.now()
-#         point = (t.microsecond - t.microsecond%10000)/10000
-#         app_time = "{0:%y%m%d-%H:%M:%S}.{1:.0f}".format(t, point)
-#         return app_time
-
-
 class MyGraph(BoxLayout):
     graph_plot = ObjectProperty(None)
     sensorEnabled = BooleanProperty(False)
     graph_y_upl = NumericProperty(2)
     graph_y_lwl = NumericProperty(-1)
-    graph_x_range = NumericProperty(100)
+    graph_x_range = NumericProperty(600)
     graph_x_hist = NumericProperty(0)
-    graph_x_step = NumericProperty(10)
+    graph_x_step = NumericProperty(600)
     data_buffer = ListProperty([[],[],[]])
     BUFFSIZE = 43200 # 12 hours = 12*3600 sec
     to_val = ListProperty([])
     Ve_value =  NumericProperty()
     Ig_value =  NumericProperty()
     Ic_value =  NumericProperty()
+    val = np.zeros((BUFFSIZE, 3))
 
 
     def __init__(self, **kwargs):
@@ -470,41 +449,46 @@ class MyGraph(BoxLayout):
         return [ve,ig,ic]
 
     def get_mydata(self, dt):
+        ####どうやってnumpy array に場所をシフトしながら値を代入していくか? しかもサイズを越えるときには古いデータから消していく.
         # val = StoreValue.make_random_data()
         print(self.to_val)
         try:
-            val = self.to_val
+            self.val[0] = self.to_val
             # self.to_val = val = [StoreValue.Ve_value, StoreValue.Ig_value, StoreValue.Ic_value]
         except:
             # print(self.to_val)
-            self.to_val = val = [0,0,0]
-        # self.to_val = val = self._make_random_data()
-        # last = self.read_file(filename) ## Read from data file
-        # self.to_val = val = last
+            self.val[0] = self.to_val = [0,0,0]
 
-        if len(self.data_buffer[0]) > self.BUFFSIZE:
-            del(self.data_buffer[0][0]) # バッファがサイズを越えたら古いvalから削除
-            del(self.data_buffer[1][0]) # バッファがサイズを越えたら古いvalから削除
-            del(self.data_buffer[2][0]) # バッファがサイズを越えたら古いvalから削除
-        if(not val == (None, None, None)):
-            self.data_buffer[0].append(val[0]) # バッファにデータを追加
-            self.data_buffer[1].append(val[1]) # バッファにデータを追加
-            self.data_buffer[2].append(val[2]) # バッファにデータを追加
-            ### 時間t を設定
-            buff_len = len(self.data_buffer[0])
-            t = list(range(buff_len))[::-1]
-            # print(len(t), len(self.data_buffer[0][-buff_len:]),\
-            #               len(self.data_buffer[1][-buff_len:]),\
-            #               len(self.data_buffer[2][-buff_len:]))
+        ### Shift 1 np array along with axis 0. Elements that roll beyond the last position are re-introduced at the first.
+        self.val = np.roll(self.val, 1, axis=0)
 
-            # tmp =  [t, self.data_buffer[0], self.data_buffer[1], self.data_buffer[2]] # 時間tリストを先頭に追加
-            output1 = list(map(list, zip(*[t, self.data_buffer[0][-buff_len:]] ))) #リストの転置
-            output2 = list(map(list, zip(*[t, self.data_buffer[1][-buff_len:]] ))) #リストの転置
-            output3 = list(map(list, zip(*[t, self.data_buffer[2][-buff_len:]] ))) #リストの転置
-            # print(output)
-            self.plot[0].points = output1
-            self.plot[1].points = output2
-            self.plot[2].points = output3
+        # if len(self.data_buffer[0]) > self.BUFFSIZE:
+        #     del(self.data_buffer[0][0]) # バッファがサイズを越えたら古いvalから削除
+        #     del(self.data_buffer[1][0]) # バッファがサイズを越えたら古いvalから削除
+        #     del(self.data_buffer[2][0]) # バッファがサイズを越えたら古いvalから削除
+        # if(not val == (None, None, None)):
+        #     self.data_buffer[0].append(val[0]) # バッファにデータを追加
+        #     self.data_buffer[1].append(val[1]) # バッファにデータを追加
+        #     self.data_buffer[2].append(val[2]) # バッファにデータを追加
+        #     ### 時間t を設定
+        #     buff_len = len(self.data_buffer[0])
+        #     t = list(range(buff_len))[::-1]
+        #     # print(len(t), len(self.data_buffer[0][-buff_len:]),\
+        #     #               len(self.data_buffer[1][-buff_len:]),\
+        #     #               len(self.data_buffer[2][-buff_len:]))
+        #
+        #     # tmp =  [t, self.data_buffer[0], self.data_buffer[1], self.data_buffer[2]] # 時間tリストを先頭に追加
+        #     output1 = list(map(list, zip(*[t, self.data_buffer[0][-buff_len:]] ))) #リストの転置
+        #     output2 = list(map(list, zip(*[t, self.data_buffer[1][-buff_len:]] ))) #リストの転置
+        #     output3 = list(map(list, zip(*[t, self.data_buffer[2][-buff_len:]] ))) #リストの転置
+        output1 = self.val[:,(0,1)] # for (t, Ve)
+        output1 = self.val[:,(0,2)] # for (t, Ig)
+        output1 = self.val[:,(0,3)] # for (t, Ic)
+
+        # print(output)
+        self.plot[0].points = output1
+        self.plot[1].points = output2
+        self.plot[2].points = output3
 
     def format_val(self, val):
         return '{0:.3f}'.format(val)
