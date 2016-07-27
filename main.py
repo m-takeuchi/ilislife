@@ -375,30 +375,29 @@ class MainView(BoxLayout):
         self.is_countup = False
         pass
 
-class StoreValue(BoxLayout):
-    """Store measured values to file
-    """
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-
-    @classmethod
-    def append_to_file(cls, filename, data1d):
-        ## ファイルにデータ書き込み
-        datastr = ''
-        with open(filename, mode = 'a', encoding = 'utf-8') as fh:
-            for data in data1d:
-                datastr += '\t'+str(data)
-            fh.write(str(cls.get_ctime()) + datastr + '\n')
-    @classmethod
-    def get_ctime(self):
-        t = dtm.datetime.now()
-        point = (t.microsecond - t.microsecond%10000)/10000
-        app_time = "{0:%y%m%d-%H:%M:%S}.{1:.0f}".format(t, point)
-        return app_time
+# class StoreValue(BoxLayout):
+#     """Store measured values to file
+#     """
+#     def __init__(self, **kwargs):
+#         super().__init__(**kwargs)
+#
+#     @classmethod
+#     def append_to_file(cls, filename, data1d):
+#         ## ファイルにデータ書き込み
+#         datastr = ''
+#         with open(filename, mode = 'a', encoding = 'utf-8') as fh:
+#             for data in data1d:
+#                 datastr += '\t'+str(data)
+#             fh.write(str(cls.get_ctime()) + datastr + '\n')
+#     @classmethod
+#     def get_ctime(self):
+#         t = dtm.datetime.now()
+#         point = (t.microsecond - t.microsecond%10000)/10000
+#         app_time = "{0:%y%m%d-%H:%M:%S}.{1:.0f}".format(t, point)
+#         return app_time
 
 
 class MyGraph(BoxLayout):
-# class Hoge(Graph):
     graph_plot = ObjectProperty(None)
     sensorEnabled = BooleanProperty(False)
     graph_y_upl = NumericProperty(2)
@@ -407,7 +406,7 @@ class MyGraph(BoxLayout):
     graph_x_hist = NumericProperty(0)
     graph_x_step = NumericProperty(10)
     data_buffer = ListProperty([[],[],[]])
-    BUFFSIZE = 1000000
+    BUFFSIZE = 43200 # 12 hours = 12*3600 sec
     to_val = ListProperty([])
     Ve_value =  NumericProperty()
     Ig_value =  NumericProperty()
@@ -449,9 +448,11 @@ class MyGraph(BoxLayout):
         try:
             if not self.sensorEnabled:
                 print('excuted do_toggle()',dt_meas)
-                Clock.schedule_interval(self.get_mydata, dt_meas)
+                # Clock.schedule_interval(StoreValue.make_random_data, dt_meas)
+                Clock.schedule_interval(self.get_mydata,dt_meas)
                 self.sensorEnabled = True
             else:
+                # Clock.unschedule(StoreValue.make_random_data)
                 Clock.unschedule(self.get_mydata)
                 self.sensorEnabled = False
         except NotImplementedError:
@@ -468,13 +469,18 @@ class MyGraph(BoxLayout):
         ic = float(last[2])*1000
         return [ve,ig,ic]
 
-
     def get_mydata(self, dt):
-        # self.to_val = val = GetValue.make_random_data()
+        # val = StoreValue.make_random_data()
+        print(self.to_val)
+        try:
+            val = self.to_val
+            # self.to_val = val = [StoreValue.Ve_value, StoreValue.Ig_value, StoreValue.Ic_value]
+        except:
+            # print(self.to_val)
+            self.to_val = val = [0,0,0]
         # self.to_val = val = self._make_random_data()
-        last = self.read_file(filename) ## Read from data file
-        self.to_val = val = last
-
+        # last = self.read_file(filename) ## Read from data file
+        # self.to_val = val = last
 
         if len(self.data_buffer[0]) > self.BUFFSIZE:
             del(self.data_buffer[0][0]) # バッファがサイズを越えたら古いvalから削除
@@ -499,7 +505,7 @@ class MyGraph(BoxLayout):
             self.plot[0].points = output1
             self.plot[1].points = output2
             self.plot[2].points = output3
-            # print(self.plot)
+
     def format_val(self, val):
         return '{0:.3f}'.format(val)
     def _make_random_data(self):
@@ -507,13 +513,35 @@ class MyGraph(BoxLayout):
         self.val = [random.random()+0.2, random.random(), random.random()-0.2]
         return self.val
 
-
-
 class StoreValue(BoxLayout):
     """Store measured values to file
     """
+    sv = ObjectProperty()
+    Ve_value =  NumericProperty()
+    Ig_value =  NumericProperty()
+    Ic_value =  NumericProperty()
+    is_random = BooleanProperty(False)
+
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
+
+    def start_random(self):
+        self.is_random = True
+        print('start_random is pressed')
+        Clock.schedule_interval(self.make_random_data, 1)
+
+    def stop_random(self):
+        self.is_random = False
+        Clock.unschedule(self.make_random_data)
+
+    # @classmethod
+    def make_random_data(self, dt):
+        ## valに値を代入する. 例では乱数を入れている.
+        self.Ve_value, self.Ig_value, self.Ic_value = random.random()+0.2, random.random(), random.random()-0.2
+        #### 値をMyGraphに渡す!
+        MyGraph.to_val = [self.Ve_value, self.Ig_value, self.Ic_value]
+        print(self.Ve_value, self.Ig_value, self.Ic_value)
+        # return
 
     @classmethod
     def append_to_file(cls, filename, data1d):
@@ -535,9 +563,9 @@ class StoreValue(BoxLayout):
 class IlislifeApp(App):
     pass
     # def build(self):
-        # self.screens["wordcomp"].bind(count_r=self.screens["score"].setter('score'))
-        # self.MyGraph(app=self).bind(Ve_value=self.MainView(app=self).setter('Ve_value'))
-        # return MyRoot()
+    #     # self.screens["wordcomp"].bind(count_r=self.screens["score"].setter('score'))
+    #     # self.MyGraph(app=self).bind(Ve_value=self.MainView(app=self).setter('Ve_value'))
+    #     return MyRoot()
 
 
 if __name__ == '__main__':

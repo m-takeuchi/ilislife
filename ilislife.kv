@@ -9,6 +9,19 @@
 #         MainView:
 
 MyRoot:
+    # do_default_tab: False
+    # TabbedPanelItem:
+    #     id: tab1
+    #     text: 'Main'
+    #     MainView:
+    # TabbedPanelItem:
+    #     id: tab2
+    #     text: 'Graph'
+    #     MyGraph:
+    #         id: gp
+
+
+<MyRoot>:
     do_default_tab: False
     TabbedPanelItem:
         id: tab1
@@ -19,8 +32,10 @@ MyRoot:
         text: 'Graph'
         MyGraph:
             id: gp
-        # Graph:
-        # StoreValue:
+    TabbedPanelItem:
+        id: tab3
+        text: 'TestRandom'
+        StoreValue:
 
 <MainView>:
     # main_view: main_view
@@ -226,8 +241,17 @@ MyRoot:
                 size_hint_x: 0.1
         Label:
             size_hint_y: 0.05
+            text: str()
         Button:
             id: toggle_button
             text: 'Stop Chart' if root.sensorEnabled else 'Start Chart'
             size_hint_y: 0.1
             on_press: root.do_toggle()
+
+<StoreValue>:
+    sv: sv
+    BoxLayout:
+        Button:
+            id: sv
+            text: "Start make_random_data" if not root.is_random else 'Stop'
+            on_press: root.start_random() if not root.is_random  else root.stop_random()
