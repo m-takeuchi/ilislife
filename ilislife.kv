@@ -32,10 +32,10 @@ MyRoot:
         text: 'Graph'
         MyGraph:
             id: gp
-    TabbedPanelItem:
-        id: tab3
-        text: 'TestRandom'
-        StoreValue:
+    # TabbedPanelItem:
+    #     id: tab3
+    #     text: 'TestRandom'
+    #     StoreValue:
 
 <MainView>:
     # main_view: main_view
@@ -188,27 +188,27 @@ MyRoot:
                 size_hint_x: 0.3
             Label:
                 color: (1, 0, 0, 1)
-                text: root.format_val(root.to_val[0]) if not root.to_val == [] else ''
+                # text: root.format_val(root.to_val[1]) if not root.to_val == [] else ''
                 size_hint_x: 0.1
             Label:
                 size_hint_x: 0.1
             Label:
                 color: (0, 1, 0, 1)
-                text: 'Ig (V)'
+                text: 'Ig (mV)'
                 size_hint_x: 0.3
             Label:
                 color: (0, 1, 0, 1)
-                text: root.format_val(root.to_val[1]) if not root.to_val == [] else ''
+                # text: root.format_val(root.to_val[2]) if not root.to_val == [] else ''
                 size_hint_x: 0.1
             Label:
                 size_hint_x: 0.1
             Label:
                 color: (0, 0.5, 1, 1)
-                text: 'Ic (V)'
+                text: 'Ic (mV)'
                 size_hint_x: 0.3
             Label:
                 color: (0, 0.5, 1, 1)
-                text: root.format_val(root.to_val[2]) if not root.to_val == [] else ''
+                # text: root.format_val(root.to_val[3])  if not root.to_val == [] else ''
                 size_hint_x: 0.1
 
         BoxLayout:
@@ -217,7 +217,7 @@ MyRoot:
             Slider:
                 id: sd1
                 max: 43200
-                min: 0
+                min: 600
                 step: root.graph_x_step
                 value: root.graph_x_range
                 on_value: root.graph_x_range = self.value

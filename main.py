@@ -107,6 +107,7 @@ class MainView(BoxLayout):
                 self.start_timer()
                 self.start_sequence(self.seq)
                 # MyGraph.do_toggle()
+                # MyGraph.do_toggle()
                 #######################
                 # else:
                     # print('Connect first')
@@ -385,11 +386,13 @@ class MyGraph(BoxLayout):
     graph_x_step = NumericProperty(600)
     data_buffer = ListProperty([[],[],[]])
     BUFFSIZE = 43200 # 12 hours = 12*3600 sec
-    to_val = ListProperty([])
+    to_val = ListProperty([0,0,0,0])#, force_dispatch=True)
     Ve_value =  NumericProperty()
     Ig_value =  NumericProperty()
     Ic_value =  NumericProperty()
-    val = np.zeros((BUFFSIZE, 3))
+    val = np.zeros((BUFFSIZE, 4))
+    t_lapse = np.arange(0,BUFFSIZE)
+
 
 
     def __init__(self, **kwargs):
@@ -438,6 +441,8 @@ class MyGraph(BoxLayout):
                 popup = ErrorPopup()
                 popup.open()
 
+
+
     def read_file(self, filename):
         last = os.popen('tail -1 '+filename).read().rsplit('\n')[0].split('\t')[2:] ### Implement
         # print(last)
@@ -449,46 +454,20 @@ class MyGraph(BoxLayout):
         return [ve,ig,ic]
 
     def get_mydata(self, dt):
-        ####どうやってnumpy array に場所をシフトしながら値を代入していくか? しかもサイズを越えるときには古いデータから消していく.
-        # val = StoreValue.make_random_data()
-        print(self.to_val)
-        try:
-            self.val[0] = self.to_val
-            # self.to_val = val = [StoreValue.Ve_value, StoreValue.Ig_value, StoreValue.Ic_value]
-        except:
-            # print(self.to_val)
-            self.val[0] = self.to_val = [0,0,0]
+        self.val[0] = self.to_val
+        ### Modify values digits
+        self.val[0, 1:] = self.val[0,1:] * (1e-3, 1e+3, 1e+3)
+        # Reset time
+        self.val[:,0] = self.t_lapse
 
-        ### Shift 1 np array along with axis 0. Elements that roll beyond the last position are re-introduced at the first.
-        self.val = np.roll(self.val, 1, axis=0)
+        output1 = self.val[:,(0,1)].tolist() # for (t, Ve)
+        output2 = self.val[:,(0,2)].tolist()  # for (t, Ig)
+        output3 = self.val[:,(0,3)].tolist()  # for (t, Ic)
 
-        # if len(self.data_buffer[0]) > self.BUFFSIZE:
-        #     del(self.data_buffer[0][0]) # バッファがサイズを越えたら古いvalから削除
-        #     del(self.data_buffer[1][0]) # バッファがサイズを越えたら古いvalから削除
-        #     del(self.data_buffer[2][0]) # バッファがサイズを越えたら古いvalから削除
-        # if(not val == (None, None, None)):
-        #     self.data_buffer[0].append(val[0]) # バッファにデータを追加
-        #     self.data_buffer[1].append(val[1]) # バッファにデータを追加
-        #     self.data_buffer[2].append(val[2]) # バッファにデータを追加
-        #     ### 時間t を設定
-        #     buff_len = len(self.data_buffer[0])
-        #     t = list(range(buff_len))[::-1]
-        #     # print(len(t), len(self.data_buffer[0][-buff_len:]),\
-        #     #               len(self.data_buffer[1][-buff_len:]),\
-        #     #               len(self.data_buffer[2][-buff_len:]))
-        #
-        #     # tmp =  [t, self.data_buffer[0], self.data_buffer[1], self.data_buffer[2]] # 時間tリストを先頭に追加
-        #     output1 = list(map(list, zip(*[t, self.data_buffer[0][-buff_len:]] ))) #リストの転置
-        #     output2 = list(map(list, zip(*[t, self.data_buffer[1][-buff_len:]] ))) #リストの転置
-        #     output3 = list(map(list, zip(*[t, self.data_buffer[2][-buff_len:]] ))) #リストの転置
-        output1 = self.val[:,(0,1)] # for (t, Ve)
-        output1 = self.val[:,(0,2)] # for (t, Ig)
-        output1 = self.val[:,(0,3)] # for (t, Ic)
-
-        # print(output)
         self.plot[0].points = output1
         self.plot[1].points = output2
         self.plot[2].points = output3
+        self.val = np.roll(self.val, 1, axis=0)
 
     def format_val(self, val):
         return '{0:.3f}'.format(val)
