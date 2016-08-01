@@ -54,14 +54,17 @@ def create_message(from_addr, to_addr, subject, body, mime, attach_file):
 def send_gmail(from_addr, id_rsa_file, passwd_rsa_file, msg):
     """Send email via gmail
     """
-    s = smtplib.SMTP('smtp.gmail.com',587)
-    s.ehlo()
-    s.starttls()
-    s.ehlo()
-    ### login to gmail with gmail account 'from_addr' and with decripted password file
-    s.login(from_addr, dec_pass(id_rsa_file, passwd_rsa_file))
-    s.send_message(msg)
-    s.close()
+    try:
+        s = smtplib.SMTP('smtp.gmail.com',587)
+        s.ehlo()
+        s.starttls()
+        s.ehlo()
+        ### login to gmail with gmail account 'from_addr' and with decripted password file
+        s.login(from_addr, dec_pass(id_rsa_file, passwd_rsa_file))
+        s.send_message(msg)
+        s.close()
+    except:
+        print('Email error occured. Email was not able to send.')
 
 def push_email(settings, title, text, attach_pdf):
     email_settings = settings
@@ -91,7 +94,8 @@ if __name__ == '__main__':
     passwd_rsa_file = email_param['passwd_rsa_file']
 
     from_addr = email_param['from_addr']
-    to_addr = ",".join(email_param['to_addrs'])
+    # to_addr = ",".join(email_param['to_addrs'])
+    to_addr = 'tawake28@icloud.com'
     subject = "Email test with python"
     body_text = "hogehogehage ageage\n日本語だー"
     ## for csv
@@ -107,4 +111,4 @@ if __name__ == '__main__':
     if email_param['bcc_addrs']:
         msg['Bcc'] = ",".join(bcc_addrs)
 
-    send_gmail(from_addr, [to_addr], msg)
+    send_gmail(from_addr, id_rsa_file, passwd_rsa_file, msg)
