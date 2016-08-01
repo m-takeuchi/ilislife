@@ -8,8 +8,8 @@ dt_op = 1 # (s) time per step for Ve change
 # List of [Voltage (V), holding time(s)]
 DT = 1800 # (s) time per step for time-dependence measurement
 #SEQ = [[5000, 360000]]
-SEQ = [[2000, DT],\
-        [2100, DT],\
+SEQ = [#[2000, DT],\
+        #[2100, DT],\
         [2200, DT],\
         [2300, DT],\
         [2400, DT],\
