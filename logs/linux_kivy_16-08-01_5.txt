@@ -1,4 +1,4 @@
-[INFO              ] Logger: Record log in /home/nanoproc/ilislife/logs/linux_kivy_16-07-25_8.txt
+[INFO              ] Logger: Record log in /home/nanoproc/ilislife/logs/linux_kivy_16-08-01_5.txt
 [INFO              ] Factory: 179 symbols loaded
 [DEBUG             ] Cache: register <kv.image> with limit=None, timeout=60
 [DEBUG             ] Cache: register <kv.atlas> with limit=None, timeout=None
@@ -50,6 +50,7 @@
 [DEBUG             ] Resource: add </usr/share/fonts/truetype/openoffice> in path list
 [DEBUG             ] Resource: add </usr/share/fonts/truetype/nanum> in path list
 [DEBUG             ] Resource: add </usr/share/fonts/truetype/abyssinica> in path list
+[DEBUG             ] Resource: add </usr/share/fonts/truetype/ricty-diminished> in path list
 [DEBUG             ] Resource: add </usr/local/share/fonts> in path list
 [DEBUG             ] Resource: add </usr/lib/python3/dist-packages/kivy/data/fonts> in path list
 [INFO              ] GL: NPOT texture support is available
@@ -70,6 +71,8 @@
 [WARNING           ] stderr:     _device = Device(_fn)
 [WARNING           ] stderr:   File "/usr/lib/python3/dist-packages/kivy/lib/mtdev.py", line 131, in __init__
 [WARNING           ] stderr:     self._fd = os.open(filename, os.O_NONBLOCK | os.O_RDONLY)
-[WARNING           ] stderr: PermissionError: [Errno 13] Permission denied: '/dev/input/event7'
+[WARNING           ] stderr: PermissionError: [Errno 13] 許可がありません: '/dev/input/event7'
 [WARNING           ] stderr: 
 [INFO              ] Base: Leaving application in progress...
+[WARNING           ] stderr: /usr/local/lib/python3.5/dist-packages/matplotlib/backends/backend_gtk3.py:219: Warning: Source ID 8 was not found when attempting to remove it
+[WARNING           ] stderr:   GLib.source_remove(self._idle_draw_id)

@@ -1,4 +1,4 @@
-[INFO              ] Logger: Record log in /home/nanoproc/ilislife/logs/linux_kivy_16-07-25_3.txt
+[INFO              ] Logger: Record log in /home/nanoproc/ilislife/logs/linux_kivy_16-08-01_2.txt
 [INFO              ] Factory: 179 symbols loaded
 [DEBUG             ] Cache: register <kv.image> with limit=None, timeout=60
 [DEBUG             ] Cache: register <kv.atlas> with limit=None, timeout=None
@@ -50,6 +50,7 @@
 [DEBUG             ] Resource: add </usr/share/fonts/truetype/openoffice> in path list
 [DEBUG             ] Resource: add </usr/share/fonts/truetype/nanum> in path list
 [DEBUG             ] Resource: add </usr/share/fonts/truetype/abyssinica> in path list
+[DEBUG             ] Resource: add </usr/share/fonts/truetype/ricty-diminished> in path list
 [DEBUG             ] Resource: add </usr/local/share/fonts> in path list
 [DEBUG             ] Resource: add </usr/lib/python3/dist-packages/kivy/data/fonts> in path list
 [INFO              ] GL: NPOT texture support is available
@@ -70,6 +71,59 @@
 [WARNING           ] stderr:     _device = Device(_fn)
 [WARNING           ] stderr:   File "/usr/lib/python3/dist-packages/kivy/lib/mtdev.py", line 131, in __init__
 [WARNING           ] stderr:     self._fd = os.open(filename, os.O_NONBLOCK | os.O_RDONLY)
-[WARNING           ] stderr: PermissionError: [Errno 13] Permission denied: '/dev/input/event7'
+[WARNING           ] stderr: PermissionError: [Errno 13] 許可がありません: '/dev/input/event7'
 [WARNING           ] stderr: 
 [INFO              ] Base: Leaving application in progress...
+[WARNING           ] stderr: Traceback (most recent call last):
+[WARNING           ] stderr:   File "main.py", line 543, in <module>
+[WARNING           ] stderr:     IlislifeApp().run()
+[WARNING           ] stderr:   File "/usr/lib/python3/dist-packages/kivy/app.py", line 828, in run
+[WARNING           ] stderr:     runTouchApp()
+[WARNING           ] stderr:   File "/usr/lib/python3/dist-packages/kivy/base.py", line 487, in runTouchApp
+[WARNING           ] stderr:     EventLoop.window.mainloop()
+[WARNING           ] stderr:   File "/usr/lib/python3/dist-packages/kivy/core/window/window_sdl2.py", line 619, in mainloop
+[WARNING           ] stderr:     self._mainloop()
+[WARNING           ] stderr:   File "/usr/lib/python3/dist-packages/kivy/core/window/window_sdl2.py", line 362, in _mainloop
+[WARNING           ] stderr:     EventLoop.idle()
+[WARNING           ] stderr:   File "/usr/lib/python3/dist-packages/kivy/base.py", line 330, in idle
+[WARNING           ] stderr:     self.dispatch_input()
+[WARNING           ] stderr:   File "/usr/lib/python3/dist-packages/kivy/base.py", line 315, in dispatch_input
+[WARNING           ] stderr:     post_dispatch_input(*pop(0))
+[WARNING           ] stderr:   File "/usr/lib/python3/dist-packages/kivy/base.py", line 221, in post_dispatch_input
+[WARNING           ] stderr:     listener.dispatch('on_motion', etype, me)
+[WARNING           ] stderr:   File "kivy/_event.pyx", line 718, in kivy._event.EventDispatcher.dispatch (kivy/_event.c:7699)
+[WARNING           ] stderr:   File "/usr/lib/python3/dist-packages/kivy/core/window/__init__.py", line 1030, in on_motion
+[WARNING           ] stderr:     self.dispatch('on_touch_down', me)
+[WARNING           ] stderr:   File "kivy/_event.pyx", line 718, in kivy._event.EventDispatcher.dispatch (kivy/_event.c:7699)
+[WARNING           ] stderr:   File "/usr/lib/python3/dist-packages/kivy/core/window/__init__.py", line 1046, in on_touch_down
+[WARNING           ] stderr:     if w.dispatch('on_touch_down', touch):
+[WARNING           ] stderr:   File "kivy/_event.pyx", line 718, in kivy._event.EventDispatcher.dispatch (kivy/_event.c:7699)
+[WARNING           ] stderr:   File "/usr/lib/python3/dist-packages/kivy/uix/widget.py", line 432, in on_touch_down
+[WARNING           ] stderr:     if child.dispatch('on_touch_down', touch):
+[WARNING           ] stderr:   File "kivy/_event.pyx", line 718, in kivy._event.EventDispatcher.dispatch (kivy/_event.c:7699)
+[WARNING           ] stderr:   File "/usr/lib/python3/dist-packages/kivy/uix/widget.py", line 432, in on_touch_down
+[WARNING           ] stderr:     if child.dispatch('on_touch_down', touch):
+[WARNING           ] stderr:   File "kivy/_event.pyx", line 718, in kivy._event.EventDispatcher.dispatch (kivy/_event.c:7699)
+[WARNING           ] stderr:   File "/usr/lib/python3/dist-packages/kivy/uix/widget.py", line 432, in on_touch_down
+[WARNING           ] stderr:     if child.dispatch('on_touch_down', touch):
+[WARNING           ] stderr:   File "kivy/_event.pyx", line 718, in kivy._event.EventDispatcher.dispatch (kivy/_event.c:7699)
+[WARNING           ] stderr:   File "/usr/lib/python3/dist-packages/kivy/uix/widget.py", line 432, in on_touch_down
+[WARNING           ] stderr:     if child.dispatch('on_touch_down', touch):
+[WARNING           ] stderr:   File "kivy/_event.pyx", line 718, in kivy._event.EventDispatcher.dispatch (kivy/_event.c:7699)
+[WARNING           ] stderr:   File "/usr/lib/python3/dist-packages/kivy/uix/widget.py", line 432, in on_touch_down
+[WARNING           ] stderr:     if child.dispatch('on_touch_down', touch):
+[WARNING           ] stderr:   File "kivy/_event.pyx", line 718, in kivy._event.EventDispatcher.dispatch (kivy/_event.c:7699)
+[WARNING           ] stderr:   File "/usr/lib/python3/dist-packages/kivy/uix/behaviors/button.py", line 110, in on_touch_down
+[WARNING           ] stderr:     self.dispatch('on_press')
+[WARNING           ] stderr:   File "kivy/_event.pyx", line 714, in kivy._event.EventDispatcher.dispatch (kivy/_event.c:7654)
+[WARNING           ] stderr:   File "kivy/_event.pyx", line 1224, in kivy._event.EventObservers.dispatch (kivy/_event.c:13497)
+[WARNING           ] stderr:   File "kivy/_event.pyx", line 1108, in kivy._event.EventObservers._dispatch (kivy/_event.c:12329)
+[WARNING           ] stderr:   File "/usr/lib/python3/dist-packages/kivy/lang.py", line 1557, in custom_callback
+[WARNING           ] stderr:     exec(__kvlang__.co_value, idmap)
+[WARNING           ] stderr:   File "./ilislife.kv", line 112, in <module>
+[WARNING           ] stderr:     on_press: root.on_command('connect/disconnect')
+[WARNING           ] stderr:   File "main.py", line 98, in on_command
+[WARNING           ] stderr:     Ve_obj, Ic_obj, Ig_obj = self.connect_device()
+[WARNING           ] stderr:   File "main.py", line 165, in connect_device
+[WARNING           ] stderr:     msg = Ve_objv.Clear()
+[WARNING           ] stderr: NameError: name 'Ve_objv' is not defined

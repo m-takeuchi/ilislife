@@ -33,6 +33,8 @@ from kivy.properties import StringProperty
 import datetime as dtm
 import random
 import numpy as np
+import plot_tdepend as tdep
+import email_pdf as epdf
 
 # Device settings
 VeAddr = 5
@@ -58,6 +60,9 @@ directory = 'data/'
 filename = directory+"{0:%y%m%d-%H%M%S}.dat".format(dtm.datetime.now())
 with open(filename, mode = 'w', encoding = 'utf-8') as fh:
     fh.write('#date\ttime(s)\tVe(kV)\tIg(V)\tIc(V)\n')
+
+# Time to make summary graph wih matplotlib
+time_mkgraph = 12*3600# sec
 
 class MyRoot(TabbedPanel):
     pass
@@ -128,10 +133,20 @@ class MainView(BoxLayout):
             self.Ic_status = Ic_obj.ClearBuffer()
             self.Ig_status = Ig_obj.ClearBuffer()
         self.Ve_value = self.volt_now
+
         ### データをファイルに追記
         StoreValue.append_to_file(filename, [self.time_now, self.Ve_value, self.Ig_value, self.Ic_value])
+        ### 経過時間がtime_mkgraphの整数倍の時、グラフｐｄｆを作成 & Send email
+        if self.time_now != 0 and self.time_now%time_mkgraph == 0:
+            tot_dose = tdep.generate_plot(filename)
+            pdffile = filename.rsplit('.dat')[0]+'.pdf'
+            print(tot_dose)
+            sbj = "[ILISLIFE] Summary Report for the last {0} hours".format(self.time_now/3600)
+            msg = "Total dose is {0} (C), {1} (C) and {2} (C) for Ig, Ic and Ig+Ic, repectively.".format(tot_dose[0], tot_dose[1], tot_dose[2])
+            epdf.push_email('email.json', sbj, msg, pdffile)
         ### データをMyGraphに送る
         MyGraph.to_val = [self.time_now, self.Ve_value, self.Ig_value, self.Ic_value]
+
         self.time_now += 1
 
     def start_timer(self):

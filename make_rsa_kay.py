@@ -19,31 +19,37 @@ def get_id_rsa_pub(id_rsa_pub_file, passphrase=None):
     return id_rsa_pub
 
 
-def make_id_rsa(passphrase=None):
-    # 秘密鍵作成
+def make_id_rsa(id_rsa_file, passphrase=None):
     # private_key = rsa.exportKey(format='PEM', passphrase='hogehoge')
     private_key = rsa.exportKey(format='PEM', passphrase=passphrase)
-    with open('id_rsa', 'wb') as f:
+    with open(id_rsa_file, 'wb') as f:
         f.write(private_key)
 
-def make_id_rsa_pub(id_rsa_file, pasphrase=None):
+def make_id_rsa_pub(id_rsa_pub_file, id_rsa_file, pasphrase=None):
     id_rsa = get_id_rsa(id_rsa_file)
     # print(id_rsa)
     public_pem = id_rsa.publickey().exportKey()
     # print(public_pem)
-    with open('id_rsa.pub', 'wb') as f:
+    with open(id_rsa_pub_file, 'wb') as f:
         f.write(public_pem)
 
 
-def encrypt(id_rsa_pub_file, plain_text_file, encrypted_text_file):
+def encrypt_file(id_rsa_pub_file, plain_text_file, encrypted_text_file):
 # # 公開鍵による暗号化
     id_rsa_pub = get_id_rsa_pub(id_rsa_pub_file)
     print(id_rsa_pub)
     with open(plain_text_file, 'r') as f:
         plain_text = f.read()
     with open(encrypted_text_file, 'wb') as f2:
-        # f2.write(id_rsa_pub.publickey().encrypt(plain_text, random_func)[0])
         f2.write(id_rsa_pub.encrypt(plain_text, random_func)[0])
+def encrypt_str(id_rsa_pub_file, string, encrypted_text_file):
+# # 公開鍵による暗号化
+    id_rsa_pub = get_id_rsa_pub(id_rsa_pub_file)
+    print(id_rsa_pub)
+    with open(encrypted_text_file, 'wb') as f:
+        f.write(id_rsa_pub.encrypt(string, random_func)[0])
+
+
 #
 # # 秘密鍵による復号化
 # with open('cipher.txt', 'r') as f:
@@ -62,18 +68,17 @@ def encrypt(id_rsa_pub_file, plain_text_file, encrypted_text_file):
 
 if __name__ == '__main__':
 
-    HOME = os.path.expanduser('~')
-    RSA_FILES = {'PRV': HOME+'/.ssh/id_rsa', 'PUB':HOME+'/.ssh/id_rsa.pub'}
-    print(os.path.expanduser(HOME+'/.ssh/'), HOME+RSA_FILES['PRV'], HOME+RSA_FILES['PUB'])
-    SSH = os.path(HOME+'/.ssh/')
-    if not SSH:
-        print('No '+HOME+'/.ssh/ dir. '+'Making .ssh/ dir in your HOME.)
+    HOME = os.path.expanduser('~/')
+    SSH = os.path.expanduser(HOME+'.ssh/')
+    RSA_FILES = {'PRV': SSH+'id_rsa', 'PUB':SSH+'id_rsa.pub'}
+
+    if not os.path.isdir(SSH):
+        print('No such '+SSH+ 'directory. '+'Making ' + SSH)
         os.mkdir(SSH)
-        input_gmail_password = input('Please input gmail password>>>  ')
-    # if not os.path(RSA_FILES['PRV']):
-    #     make_id_rsa(RSA_FILES['PRV'])
-    # if not os.path(RSA_FILES['PUB']):
-    #     make_id_rsa_pub(RSA_FILES['PUB'])
-    # print(get_id_rsa('id_rsa'))
-    # print(get_id_rsa_pub('id_rsa.pub'))
-    # encrypt(RSA_FILES['PUB'], input_gmail_password, 'pass.rsa')
+    if not os.path.isfile(RSA_FILES['PRV']):
+        make_id_rsa(RSA_FILES['PRV'], 600)
+    if not os.path.isfile(RSA_FILES['PUB']):
+        make_id_rsa_pub(RSA_FILES['PUB'], RSA_FILES['PRV'])
+    input_gmail_password = input('Please input gmail password>>>  ')
+    # print(input_gmail_password)
+    encrypt_str(RSA_FILES['PUB'], bytes(input_gmail_password, 'utf-8'), 'pass.rsa')

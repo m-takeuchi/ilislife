@@ -1,4 +1,4 @@
-[INFO              ] Logger: Record log in /home/nanoproc/ilislife/logs/linux_kivy_16-07-25_6.txt
+[INFO              ] Logger: Record log in /home/nanoproc/ilislife/logs/linux_kivy_16-07-27_19.txt
 [INFO              ] Factory: 179 symbols loaded
 [DEBUG             ] Cache: register <kv.image> with limit=None, timeout=60
 [DEBUG             ] Cache: register <kv.atlas> with limit=None, timeout=None
