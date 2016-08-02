@@ -16,8 +16,8 @@ def generate_plot(datafile):
 
     ### Omit abnormal data
 
-    ignore1 = data['Ig'].abs() > 1e+10
-    ignore2 = data['Ic'] > 1e+10
+    ignore1 = data['Ig'].abs() > 1e+3
+    ignore2 = data['Ic'].abs() > 1e+3
     data = data[(ignore1 | ignore2) == False]
 
     # fig = plt.figure()
