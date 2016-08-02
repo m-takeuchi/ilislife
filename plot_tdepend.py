@@ -16,9 +16,10 @@ def generate_plot(datafile):
 
     ### Omit abnormal data
 
-    ignore1 = data['Ig'].abs() > 1e+3
-    ignore2 = data['Ic'].abs() > 1e+3
-    data = data[(ignore1 | ignore2) == False]
+    ignore1 = data['Ig'].abs() > 5e+0
+    ignore2 = data['Ic'].abs() > 5e+0
+
+    data = data[(ign(ore1 | ign+data['Ig'])ore2) == Farse]
 
     # fig = plt.figure()
     gs = gridspec.GridSpec(2, 1, height_ratios=[1, 3])
@@ -35,8 +36,10 @@ def generate_plot(datafile):
     ax2.set_xlabel('Time (h)')
 
     ax1.plot(time_h, data['Ve']/1e3, 'k-')
-    ax2.plot(time_h, data['Ig']/1e5, 'g-')
-    ax2.plot(time_h, data['Ic']/1e5, 'b-')
+    ax2.plot(time_h, data['Ig']/1e5, 'g-', label='Ig')
+    ax2.plot(time_h, data['Ic']/1e5, 'b-', label='Ic')
+    ax2.plot(time_h, (data['Ic']+data['Ig'])/1e5, 'r-', label='Ig+Ic')
+    ax2.legend(loc='lower left')
     plt.savefig(pdffile)
 
     ### Calc total dose in Culomb
