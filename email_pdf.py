@@ -94,10 +94,10 @@ if __name__ == '__main__':
     passwd_rsa_file = email_param['passwd_rsa_file']
 
     from_addr = email_param['from_addr']
-    # to_addr = ",".join(email_param['to_addrs'])
-    to_addr = 'tawake28@icloud.com'
+    to_addr = ",".join(email_param['to_addrs'])
+    # to_addr = 'testaddr@hoge.com'
     subject = "Email test with python"
-    body_text = "hogehogehage ageage\n日本語だー"
+    body_text = "hogehogehage ageage"
     ## for csv
     # mime={'type':'text', 'subtype':'comma-separated-values'}
     # attach_file={'name':'test.csv', 'path':'/tmp/test.csv'}
