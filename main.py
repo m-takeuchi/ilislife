@@ -67,7 +67,7 @@ with open(filename, mode = 'w', encoding = 'utf-8') as fh:
     fh.write('#date\ttime(s)\tVe(kV)\tIg(V)\tIc(V)\tP(Pa)\n')
 
 # Time to make summary graph wih matplotlib
-time_mkgraph = 12*3600# sec
+time_mkgraph = 6*3600# sec
 
 class MyRoot(TabbedPanel):
     pass
