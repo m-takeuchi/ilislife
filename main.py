@@ -46,7 +46,7 @@ IgAddr = 2
 if _platform == "linux" or _platform == "linux2":
     # linux
     tty = '/dev/ttyUSB0'
-    ttyRS232 = '/dev/tty.usbserial-FTAJM1O6'
+    ttyRS232 = '/dev/ttyUSB1'
 elif _platform == "darwin":
     # OS X
     tty = '/dev/tty.usbserial-PXWV0AMC'
