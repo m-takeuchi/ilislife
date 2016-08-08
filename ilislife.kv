@@ -93,6 +93,12 @@ MyRoot:
                 Label:
                     text: str(root.Ig_status)+' (V)/Rs'
                     # size_hint_y: 0.2
+                Label:
+                    text: 'P : '
+                    # size_hint_y: 0.2
+                Label:
+                    text: str(root.P_status)+' (Pa)'
+                    # size_hint_y: 0.2
             # StoreValue:
             # BoxLayout:
             #     orientation: 'vertical'
@@ -208,6 +214,14 @@ MyRoot:
                 size_hint_x: 0.3
             Label:
                 color: (0, 0.5, 1, 1)
+                # text: root.format_val(root.to_val[3])  if not root.to_val == [] else ''
+                size_hint_x: 0.1
+            Label:
+                color: (0.5, 0.5, 1, 1)
+                text: 'P (log(Pa))'
+                size_hint_x: 0.3
+            Label:
+                color: (0.5, 0.5, 1, 1)
                 # text: root.format_val(root.to_val[3])  if not root.to_val == [] else ''
                 size_hint_x: 0.1
 
