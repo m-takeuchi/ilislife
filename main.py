@@ -136,8 +136,8 @@ class MainView(BoxLayout):
             self.Ic_value = Ic_obj.Measure()
             start = time.time()
             self.P_value  = P_obj.RP()
-            elapsed_time = time.time() - start
-            print('elapsed_time: '+str(elapsed_time))
+            #elapsed_time = time.time() - start
+            #print('elapsed_time: '+str(elapsed_time))
             self.Ic_status = str(self.Ic_value)
             self.Ig_status = str(self.Ig_value)
             self.P_status  = "{0:1.2e}".format(self.P_value)

@@ -12,7 +12,7 @@ class RS232():
 # At first, get initialized
     def __init__(self, portname, unitnum=1):
         self._portname_ = portname
-        self.raw = serial.Serial(self._portname_, BAUDRATE, timeout=0.05, rtscts=True)
+        self.raw = serial.Serial(self._portname_, BAUDRATE, timeout=0.1, rtscts=True)
         time.sleep(0.2)
 
     ### Basic I/O
@@ -48,11 +48,15 @@ class RS232():
         """ Interpretation buffer str as formatted number
         """
         res = self._ask(buffer)
-        str_l = re.split('[Ee]', res)[0]
-        str_r = re.split('[Ee]', res)[1]
-        num_l = float(str_l)
-        num_r = float(str_r)
-        ans = num_l*10**num_r
+#        str_l = re.split('[Ee]', res)[0]
+#        str_r = re.split('[Ee]', res)[1]
+#        num_l = float(str_l)
+#        num_r = float(str_r)
+#        ans = num_l*10**num_r
+        try:
+            ans = float(res)
+        except ValueError:
+            ans = float(0)
         return ans
 
     def putParam(self, buffer, param, dig):
